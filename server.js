@@ -5,7 +5,8 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import adminRoutes from "./routes/adminRoutes.js";
-import connectDB from "./config/db.js"; // ✅ import koneksi
+import connectDB from "./config/db.js";
+import { registerIfNotExist } from "./controllers/adminController.js"; // ✅ import
 
 dotenv.config();
 const app = express();
@@ -24,8 +25,15 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Routes
 app.use("/api/admin", adminRoutes);
 
-// ✅ Koneksi ke MongoDB
-connectDB();
+// ✅ Connect Mongo lalu buat admin default
+connectDB().then(() => {
+  registerIfNotExist(); // ⬅️ panggil di sini
+});
+
+// Default route (optional, buat test di Railway)
+app.get("/", (req, res) => {
+  res.send("🚀 API is running...");
+});
 
 // Jalankan server
 const PORT = process.env.PORT || 5001;
