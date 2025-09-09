@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(cors({
-  origin: ["https://fe-hazel-pi.vercel.app"], // FE kamu di Vercel
+  origin: ["https://mtsmuhammadiyah-vercel-app.vercel.app"], // FE kamu di Vercel
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
