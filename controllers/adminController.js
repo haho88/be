@@ -2,7 +2,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Admin from "../models/Admin.js";
-import KontenBerita from "../models/KontenBerita.js";
+//import KontenBerita from "../models/KontenBerita.js";
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
