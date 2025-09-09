@@ -7,12 +7,12 @@ const connectDB = async () => {
     let mongoURI;
 
     if (process.env.NODE_ENV === "production") {
-      // 🔹 kalau running di Railway server → pakai INTERNAL (27017)
-      mongoURI = process.env.MONGO_INTERNAL_URI || process.env.MONGO_URI;
-    } else {
-      // 🔹 kalau running di lokal → pakai PUBLIC (23302) atau Localhost
-      mongoURI = process.env.MONGO_PUBLIC_URI || "mongodb://127.0.0.1:27017/mtsmuhcil";
-    }
+  // pakai Atlas kalau di production
+  mongoURI = process.env.MONGO_URI_ATLAS;
+} else {
+  // lokal pakai public/localhost
+  mongoURI = process.env.MONGO_PUBLIC_URI || "mongodb://127.0.0.1:27017/mtsmuhcil";
+}
 
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
