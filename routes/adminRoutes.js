@@ -200,13 +200,24 @@ router.delete("/alumni/:id", auth, async (req, res) => {
 
 // ---------- Berita ----------
 router.get("/berita", async (req, res) => {
-  const items = await Berita.find().sort({ createdAt: -1 });
-  res.json(items);
+  try {
+    const items = await Berita.find().sort({ createdAt: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: "Gagal ambil berita" });
+  }
 });
+
 router.get("/berita/:id", async (req, res) => {
-  const item = await Berita.findById(req.params.id);
-  res.json(item);
+  try {
+    const item = await Berita.findById(req.params.id);
+    if (!item) return res.status(404).json({ error: "Berita tidak ditemukan" });
+    res.json(item);
+  } catch (err) {
+    res.status(500).json({ error: "Gagal ambil detail berita" });
+  }
 });
+
 router.post("/berita", auth, upload.single("cover"), async (req, res) => {
   try {
     const obj = { ...req.body };
@@ -224,6 +235,7 @@ router.put("/berita/:id", auth, upload.single("cover"), async (req, res) => {
     const body = { ...req.body };
     if (req.file) body.cover = req.file.filename;
     const u = await Berita.findByIdAndUpdate(req.params.id, body, { new: true });
+    if (!u) return res.status(404).json({ error: "Berita tidak ditemukan" });
     res.json(u);
   } catch (err) {
     console.error("❌ Error update berita:", err.message);
@@ -232,9 +244,26 @@ router.put("/berita/:id", auth, upload.single("cover"), async (req, res) => {
 });
 
 router.delete("/berita/:id", auth, async (req, res) => {
-  await Berita.findByIdAndDelete(req.params.id);
-  res.json({ message: "deleted" });
+  try {
+    const berita = await Berita.findById(req.params.id);
+    if (!berita) return res.status(404).json({ error: "Berita tidak ditemukan" });
+
+    // Jika ada cover gambar, hapus file dari folder uploads
+    if (berita.cover) {
+      const filePath = path.join(process.cwd(), "uploads", berita.cover);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    await Berita.findByIdAndDelete(req.params.id);
+    res.json({ message: "Berita dan cover berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Error hapus berita:", err.message);
+    res.status(500).json({ error: "Gagal hapus berita" });
+  }
 });
+
 
 // ---------- Galeri ----------
 router.get("/galeri", async (req, res) => {
