@@ -32,19 +32,24 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET berdasarkan type dinamis (misal: /profil/sejarah)
+// GET berdasarkan type (misal: /profil/sejarah, /profil/visi-misi, dll.)
 router.get("/:type", async (req, res) => {
   try {
     const { type } = req.params;
+
     const data = await Profil.find({ type: type.toLowerCase() });
+
+    // Kalau kosong jangan 404, balikin array kosong aja
     if (!data || data.length === 0) {
-      return res.status(404).json({ message: `Data ${type} belum ada` });
+      return res.json([]);
     }
+
     res.json(data);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 // POST tambah data
 router.post("/", upload.single("image"), async (req, res) => {
