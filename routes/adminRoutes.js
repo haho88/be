@@ -207,18 +207,30 @@ router.get("/berita/:id", async (req, res) => {
   const item = await Berita.findById(req.params.id);
   res.json(item);
 });
-router.post("/berita", auth, upload.single("foto"), async (req, res) => {
-  const obj = { ...req.body };
-  if (req.file) obj.cover = req.file.filename;
-  const doc = await Berita.create(obj);
-  res.json(doc);
+router.post("/berita", auth, upload.single("cover"), async (req, res) => {
+  try {
+    const obj = { ...req.body };
+    if (req.file) obj.cover = req.file.filename;
+    const doc = await Berita.create(obj);
+    res.json(doc);
+  } catch (err) {
+    console.error("❌ Error simpan berita:", err.message);
+    res.status(500).json({ error: "Gagal simpan berita" });
+  }
 });
-router.put("/berita/:id", auth, upload.single("foto"), async (req, res) => {
-  const body = { ...req.body };
-  if (req.file) body.cover = req.file.filename;
-  const u = await Berita.findByIdAndUpdate(req.params.id, body, { new: true });
-  res.json(u);
+
+router.put("/berita/:id", auth, upload.single("cover"), async (req, res) => {
+  try {
+    const body = { ...req.body };
+    if (req.file) body.cover = req.file.filename;
+    const u = await Berita.findByIdAndUpdate(req.params.id, body, { new: true });
+    res.json(u);
+  } catch (err) {
+    console.error("❌ Error update berita:", err.message);
+    res.status(500).json({ error: "Gagal update berita" });
+  }
 });
+
 router.delete("/berita/:id", auth, async (req, res) => {
   await Berita.findByIdAndDelete(req.params.id);
   res.json({ message: "deleted" });
