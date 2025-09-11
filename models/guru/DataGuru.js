@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const guruSchema = new mongoose.Schema(
+const DataGuruSchema = new mongoose.Schema(
   {
     nama: { type: String, required: true },
     jabatan: { type: String, required: true }, // contoh: "Guru Matematika"
@@ -10,5 +10,5 @@ const guruSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Guru = mongoose.model("DataGuru", DataguruSchema);
+const Guru = mongoose.model("DataGuru", DataGuruSchema);
 export default DataGuru;
