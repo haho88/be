@@ -7,9 +7,11 @@ import { fileURLToPath } from "url";
 import adminRoutes from "./routes/adminRoutes.js";
 import connectDB from "./config/db.js";
 import { registerIfNotExist } from "./controllers/adminController.js"; // ✅ import
+import profilRoutes from "./routes/profilRoutes.js";
 
 dotenv.config();
 const app = express();
+app.use("/profil", profilRoutes);
 
 // Fix __dirname in ES Module
 const __filename = fileURLToPath(import.meta.url);
