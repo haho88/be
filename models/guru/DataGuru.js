@@ -10,5 +10,5 @@ const DataGuruSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Guru = mongoose.model("DataGuru", DataGuruSchema);
+const DataGuru = mongoose.model("DataGuru", DataGuruSchema);
 export default DataGuru;
