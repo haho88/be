@@ -1,4 +1,4 @@
-const Sejarah = require("../../models/profil/Fasilitas");
+const Fasilitas = require("../../models/profil/Fasilitas");
 
 // GET
 exports.getAll = async (req, res) => {
