@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const DatastafSchema = new mongoose.Schema(
+const DataStafSchema = new mongoose.Schema(
   {
     nama: { type: String, required: true },
     jabatan: { type: String, required: true }, // contoh: "TU / Tata Usaha"
@@ -10,5 +10,5 @@ const DatastafSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Staf = mongoose.model("DataStaf", DatastafSchema);
+const DataStaf = mongoose.model("DataStaf", DatastafSchema);
 export default DataStaf;
