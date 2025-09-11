@@ -11,7 +11,7 @@ import profilRoutes from "./routes/profilRoutes.js";
 
 dotenv.config();
 const app = express();
-app.use("/profil", profilRoutes);
+
 
 // Fix __dirname in ES Module
 const __filename = fileURLToPath(import.meta.url);
@@ -31,7 +31,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/api/admin", adminRoutes);
-
+app.use("/profil", profilRoutes);
 // ✅ Connect Mongo lalu buat admin default
 connectDB().then(() => {
   registerIfNotExist(); // ⬅️ panggil di sini
