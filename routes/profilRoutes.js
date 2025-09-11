@@ -1,3 +1,4 @@
+// routes/profilRoutes.js
 import express from "express";
 import Profil from "../models/Profil.js";
 import multer from "multer";
@@ -21,7 +22,7 @@ const upload = multer({ storage });
 
 // ========== ROUTES ==========
 
-// GET semua profil (untuk admin dashboard)
+// GET semua profil (admin dashboard)
 router.get("/", async (req, res) => {
   try {
     const data = await Profil.find().sort({ createdAt: -1 });
@@ -31,12 +32,14 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET berdasarkan type (misal: /profil/sejarah, /profil/visi-misi, dll.)
+// GET berdasarkan type dinamis (misal: /profil/sejarah)
 router.get("/:type", async (req, res) => {
   try {
     const { type } = req.params;
-    const data = await Profil.findOne({ type: type.toLowerCase() });
-    if (!data) return res.status(404).json({ message: `Data ${type} belum ada` });
+    const data = await Profil.find({ type: type.toLowerCase() });
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: `Data ${type} belum ada` });
+    }
     res.json(data);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -49,7 +52,13 @@ router.post("/", upload.single("image"), async (req, res) => {
     const { type, title, content } = req.body;
     const image = req.file ? req.file.filename : undefined;
 
-    const doc = await Profil.create({ type: type.toLowerCase(), title, content, image });
+    const doc = await Profil.create({
+      type: type.toLowerCase(),
+      title,
+      content,
+      image,
+    });
+
     res.json(doc);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -63,18 +72,74 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     if (body.type) body.type = body.type.toLowerCase();
     if (req.file) body.image = req.file.filename;
 
-    const updated = await Profil.findByIdAndUpdate(req.params.id, body, { new: true });
+    const updated = await Profil.findByIdAndUpdate(req.params.id, body, {
+      new: true,
+    });
     res.json(updated);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// DELETE data
+// DELETE data + hapus file gambar
 router.delete("/:id", async (req, res) => {
   try {
-    await Profil.findByIdAndDelete(req.params.id);
+    const deleted = await Profil.findByIdAndDelete(req.params.id);
+
+    if (deleted?.image) {
+      const filePath = path.join(UPLOAD_DIR, deleted.image);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
     res.json({ message: "Data profil berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ========== ENDPOINT KHUSUS ==========
+router.get("/sejarah/all", async (req, res) => {
+  try {
+    const data = await Profil.find({ type: "sejarah" });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get("/visi-misi/all", async (req, res) => {
+  try {
+    const data = await Profil.find({ type: "visi-misi" });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get("/fasilitas/all", async (req, res) => {
+  try {
+    const data = await Profil.find({ type: "fasilitas" });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get("/sambutan/all", async (req, res) => {
+  try {
+    const data = await Profil.find({ type: "sambutan" });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get("/struktur/all", async (req, res) => {
+  try {
+    const data = await Profil.find({ type: "struktur" });
+    res.json(data);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
