@@ -8,6 +8,8 @@ import adminRoutes from "./routes/adminRoutes.js";
 import connectDB from "./config/db.js";
 import { registerIfNotExist } from "./controllers/adminController.js"; // ✅ import
 import profilRoutes from "./routes/profilRoutes.js";
+import guruRoutes from "./routes/guruRoutes.js";
+import stafRoutes from "./routes/stafRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -32,6 +34,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Routes
 app.use("/api/admin", adminRoutes);
 app.use("/profil", profilRoutes);
+app.use("/api/guru", guruRoutes);
+app.use("/api/staf", stafRoutes);
+
 // ✅ Connect Mongo lalu buat admin default
 connectDB().then(() => {
   registerIfNotExist(); // ⬅️ panggil di sini
