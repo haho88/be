@@ -20,13 +20,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware
+// Middleware
 app.use(cors({
-  origin: ["https://mtsmuhammadiyah-vercel-app.vercel.app"], // FE kamu di Vercel
+  origin: ["https://mtsmuhammadiyah-vercel-app.vercel.app"], 
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
+
+// Preflight
+app.options("*", cors());
+
 app.use(express.json());
+;
 
 // Serve file uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
