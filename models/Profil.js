@@ -5,7 +5,7 @@ const ProfilSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["visi-misi", "sejarah", "struktur", "fasilitas"],
+      enum: ["visi-misi", "sejarah", "struktur","sambutan", "fasilitas"],
       required: true,
       default: "visi-misi", // default value jika tidak dikirim
     },
