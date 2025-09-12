@@ -22,11 +22,29 @@ const __dirname = path.dirname(__filename);
 // Middleware
 // Middleware
 app.use(cors({
-  origin: ["https://mtsmuhammadiyah-vercel-app.vercel.app"], 
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://mtsmuhammadiyah-vercel-app.vercel.app", // frontend vercel
+      "http://localhost:3000" // local dev
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization",
   credentials: true,
 }));
+
+// Pastikan OPTIONS di-handle
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.sendStatus(200);
+});
 
 // Preflight
 app.options("*", cors());
