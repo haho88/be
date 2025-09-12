@@ -6,71 +6,54 @@ import path from "path";
 import { fileURLToPath } from "url";
 import adminRoutes from "./routes/adminRoutes.js";
 import connectDB from "./config/db.js";
-import { registerIfNotExist } from "./controllers/adminController.js"; // ✅ import
-import profilRoutes from "./routes/profilRoutes.js";
-
-
+import { registerIfNotExist } from "./controllers/adminController.js";
 
 dotenv.config();
 const app = express();
 
-
-// Fix __dirname in ES Module
+// Fix __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
-// Middleware
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      "https://mtsmuhammadiyah-vercel-app.vercel.app", // frontend vercel
-      "http://localhost:3000" // local dev
-    ];
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: "GET,POST,PUT,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type,Authorization",
-  credentials: true,
-}));
+// ✅ CORS Setup fix untuk Railway + Vercel
+const allowedOrigins = [
+  "https://mtsmuhammadiyah-vercel-app.vercel.app", // frontend
+  "http://localhost:3000", // local dev
+];
 
-// Pastikan OPTIONS di-handle
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.sendStatus(200);
+  res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
 });
 
-// Preflight
-app.options("*", cors());
-
 app.use(express.json());
-;
 
-// Serve file uploads
+// Serve uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/api/admin", adminRoutes);
-app.use("/profil", profilRoutes);
 
-
-// ✅ Connect Mongo lalu buat admin default
+// DB connect + admin default
 connectDB().then(() => {
-  registerIfNotExist(); // ⬅️ panggil di sini
+  registerIfNotExist();
 });
 
-// Default route (optional, buat test di Railway)
+// Root
 app.get("/", (req, res) => {
-  res.send("🚀 API is running...");
+  res.send("🚀 API is running and CORS fixed...");
 });
 
-// Jalankan server
+// Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
