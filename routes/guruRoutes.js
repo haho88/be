@@ -51,4 +51,14 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
+// Hapus data dari DB
+    await Guru.findByIdAndDelete(req.params.id);
+
+    res.json({ message: "Data dan foto berhasil dihapus" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Gagal menghapus data guru" });
+  }
+});
+
 export default router;
