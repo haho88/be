@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import adminRoutes from "./routes/adminRoutes.js";
+import profilRoutes from "./routes/profilRoutes.js";
 import connectDB from "./config/db.js";
 import { registerIfNotExist } from "./controllers/adminController.js";
 
@@ -43,6 +44,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/api/admin", adminRoutes);
+app.use("/api/profil", profilRoutes); 
 
 // DB connect + admin default
 connectDB().then(() => {
