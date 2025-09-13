@@ -15,7 +15,7 @@ import Berita from "../models/Berita.js";
 import Galeri from "../models/Galeri.js";
 import Pengumuman from "../models/Pengumuman.js";
 import PPDB from "../models/PPDB.js";
-import { Guru, getGuru } from "../controllers/guruController.js";
+
 
 const router = express.Router();
 
