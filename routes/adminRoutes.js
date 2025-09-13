@@ -9,6 +9,7 @@ import fs from "fs";
 import Admin from "../models/Admin.js";
 import Profil from "../models/Profil.js";
 import Guru from "../models/Guru.js";
+import Staf from "../models/Staf.js";
 import Siswa from "../models/Siswa.js";
 import Alumni from "../models/Alumni.js";
 import Berita from "../models/Berita.js";
@@ -142,6 +143,47 @@ router.delete("/guru/:id", auth, async (req, res) => {
 
     await guru.deleteOne();
     res.json({ message: "Guru berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ---------- Staf ----------
+router.get("/staf", async (req, res) => {
+  try {
+    const items = await staf.find().sort({ createdAt: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post("/staf", auth, upload.single("foto"), async (req, res) => {
+  const obj = { ...req.body };
+  if (req.file) obj.foto = req.file.filename;
+  const doc = await Staf.create(obj);
+  res.json(doc);
+});
+
+router.put("/staf/:id", auth, upload.single("foto"), async (req, res) => {
+  const body = { ...req.body };
+  if (req.file) body.foto = req.file.filename;
+  const u = await Staf.findByIdAndUpdate(req.params.id, body, { new: true });
+  res.json(u);
+});
+
+router.delete("/staf/:id", auth, async (req, res) => {
+  try {
+    const staf = await Staf.findById(req.params.id);
+    if (!staf) return res.status(404).json({ message: "Guru tidak ditemukan" });
+
+    if (staf.foto) {
+      const filePath = path.join(process.cwd(), "uploads", staf.foto);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+
+    await staf.deleteOne();
+    res.json({ message: "Staf berhasil dihapus" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
