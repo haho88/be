@@ -8,7 +8,7 @@ import fs from "fs";
 
 import Admin from "../models/Admin.js";
 import Profil from "../models/Profil.js";
-import {VisiMisi} from "../models/profil/VisiMisi.js";
+import VisiMisi from "../models/profil/VisiMisi.js";
 import Guru from "../models/Guru.js";
 import Staf from "../models/Staf.js";
 import Siswa from "../models/Siswa.js";
