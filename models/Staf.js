@@ -5,6 +5,7 @@ const stafSchema = new mongoose.Schema({
   nama: { type: String, required: true },
   jobdesk: { type: String, required: true },
   jabatan: { type: String },
+  tahun: { type: Number }, 
   foto: { type: String }
 }, { timestamps: true });
 
