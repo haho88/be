@@ -148,10 +148,11 @@ router.delete("/guru/:id", auth, async (req, res) => {
   }
 });
 
+
 // ---------- Staf ----------
 router.get("/staf", async (req, res) => {
   try {
-    const items = await staf.find().sort({ createdAt: -1 });
+    const items = await Staf.find().sort({ createdAt: -1 }); // ✅ pakai model Staf
     res.json(items);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -175,7 +176,7 @@ router.put("/staf/:id", auth, upload.single("foto"), async (req, res) => {
 router.delete("/staf/:id", auth, async (req, res) => {
   try {
     const staf = await Staf.findById(req.params.id);
-    if (!staf) return res.status(404).json({ message: "Guru tidak ditemukan" });
+    if (!staf) return res.status(404).json({ message: "Staf tidak ditemukan" }); // ✅ perbaikan
 
     if (staf.foto) {
       const filePath = path.join(process.cwd(), "uploads", staf.foto);
@@ -188,6 +189,7 @@ router.delete("/staf/:id", auth, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 // ---------- Siswa ----------
 router.get("/siswa", async (req, res) => {
