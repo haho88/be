@@ -122,6 +122,10 @@ router.post("/guru", auth, upload.single("foto"), async (req, res) => {
   if (req.file) obj.foto = req.file.filename;
   const doc = await Guru.create(obj);
   res.json(doc);
+  } catch (err) {
+    console.error("❌ Error tambah guru:", err.message);
+    res.status(500).json({ message: err.message });
+  }
 });
 
 router.put("/guru/:id", auth, upload.single("foto"), async (req, res) => {
@@ -406,19 +410,6 @@ router.delete("/ppdb/:id", auth, async (req, res) => {
     res.status(500).json({ error: "Gagal hapus data" });
   }
 });
-
-
-// Ambil semua data guru
-router.get("/guru", async (req, res) => {
-  try {
-    const data = await Guru.find();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
 
 
 export default router;
