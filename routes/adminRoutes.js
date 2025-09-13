@@ -8,6 +8,7 @@ import fs from "fs";
 
 import Admin from "../models/Admin.js";
 import Profil from "../models/Profil.js";
+import VisiMisi from "../models/profil/VisiMisi.js";
 import Guru from "../models/Guru.js";
 import Staf from "../models/Staf.js";
 import Siswa from "../models/Siswa.js";
@@ -105,6 +106,27 @@ router.put("/profil/:id", auth, upload.single("image"), async (req, res) => {
 router.delete("/profil/:id", auth, async (req, res) => {
   await Profil.findByIdAndDelete(req.params.id);
   res.json({ message: "deleted" });
+});
+
+// ----------Ambil semua data VisiMisi ----------
+router.get("/", async (req, res) => {
+  try {
+    const data = await VisiMisi.find();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Tambah data
+router.post("/", async (req, res) => {
+  try {
+    const newData = new VisiMisi(req.body);
+    await newData.save();
+    res.status(201).json(newData);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
 // ---------- Guru ----------
