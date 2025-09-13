@@ -1,11 +1,12 @@
-const mongoose = require("mongoose");
+// models/profil/VisiMisi.js
+import mongoose from "mongoose";
 
 const visiMisiSchema = new mongoose.Schema(
   {
     visi: { type: String, required: true },
-    misi: [{ type: String }], // array misi
+    misi: [{ type: String }],
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("VisiMisi", visiMisiSchema);
+export default mongoose.model("VisiMisi", visiMisiSchema);
