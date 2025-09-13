@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const stafSchema = new mongoose.Schema({
   nama: { type: String, required: true },
-  Jobdesk: { type: String, required: true },
+  jobdesk: { type: String, required: true },
   jabatan: { type: String },
   foto: { type: String }
 }, { timestamps: true });
