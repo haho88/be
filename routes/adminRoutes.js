@@ -118,6 +118,7 @@ router.get("/guru", async (req, res) => {
 });
 
 router.post("/guru", auth, upload.single("foto"), async (req, res) => {
+try {
   const obj = { ...req.body };
   if (req.file) obj.foto = req.file.filename;
   const doc = await Guru.create(obj);
