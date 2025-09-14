@@ -9,7 +9,9 @@ import fs from "fs";
 import Admin from "../models/Admin.js";
 import Profil from "../models/Profil.js";
 import VisiMisi from "../models/profil/VisiMisi.js";
-import VisiMisi from "../models/profil/Sambutan.js";
+import Sambutan from "../models/profil/Sambutan.js";
+import Fasilitas from "../models/profil/Fasilitas.js";
+import StrukturOrganisasi from "../models/profil/StrukturOrganisasi.js";
 import Guru from "../models/Guru.js";
 import Staf from "../models/Staf.js";
 import Siswa from "../models/Siswa.js";
@@ -150,6 +152,49 @@ router.post("/", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
+// ----------Ambil semua data Fasilitas ----------
+router.get("/", async (req, res) => {
+  try {
+    const data = await Fasilitas.find();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Tambah data
+router.post("/", async (req, res) => {
+  try {
+    const newData = new Fasilitas(req.body);
+    await newData.save();
+    res.status(201).json(newData);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// ----------Ambil semua data Struktur Organisasi ----------
+router.get("/", async (req, res) => {
+  try {
+    const data = await StrukturOrganisasi.find();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Tambah data
+router.post("/", async (req, res) => {
+  try {
+    const newData = new StruturOrganisasi(req.body);
+    await newData.save();
+    res.status(201).json(newData);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 
 // ---------- Guru ----------
 router.get("/guru", async (req, res) => {
