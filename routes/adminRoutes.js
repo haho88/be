@@ -9,6 +9,7 @@ import fs from "fs";
 import Admin from "../models/Admin.js";
 import Profil from "../models/Profil.js";
 import VisiMisi from "../models/profil/VisiMisi.js";
+import VisiMisi from "../models/profil/Sambutan.js";
 import Guru from "../models/Guru.js";
 import Staf from "../models/Staf.js";
 import Siswa from "../models/Siswa.js";
@@ -122,6 +123,27 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const newData = new VisiMisi(req.body);
+    await newData.save();
+    res.status(201).json(newData);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// ----------Ambil semua data Sambutan ----------
+router.get("/", async (req, res) => {
+  try {
+    const data = await Sambutan.find();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Tambah data
+router.post("/", async (req, res) => {
+  try {
+    const newData = new Sambutan(req.body);
     await newData.save();
     res.status(201).json(newData);
   } catch (err) {
