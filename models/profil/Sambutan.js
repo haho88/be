@@ -1,13 +1,12 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const sambutanSchema = new mongoose.Schema(
   {
-    judul: { type: String, required: true },
-    isi: { type: String, required: true },
-    penulis: { type: String }, // misal Kepala Sekolah
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    image: { type: String }, // opsional kalau pakai upload
   },
   { timestamps: true }
 );
 
 export default mongoose.model("Sambutan", sambutanSchema);
-
