@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const fasilitasSchema = new mongoose.Schema(
   {
     nama: { type: String, required: true },
     deskripsi: { type: String },
-    gambar: { type: String }, // opsional, simpan URL gambar
+    foto: { type: String }, // simpan nama file/folder
   },
   { timestamps: true }
 );
