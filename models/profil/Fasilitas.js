@@ -9,4 +9,4 @@ const fasilitasSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Fasilitas", fasilitasSchema);
+export default mongoose.model("Fasilitas", fasilitasSchema);
