@@ -9,5 +9,5 @@ const sambutanSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Sambutan", sambutanSchema);
+export default mongoose.model("Sambutan", sambutanSchema);
 
