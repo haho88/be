@@ -151,26 +151,61 @@ router.post("/sambutan", auth, async (req, res) => {
   }
 });
 
-// ---------- Fasilitas ----------
+// ==================== FASILITAS ====================
+// GET semua fasilitas
 router.get("/fasilitas", async (req, res) => {
   try {
     const data = await Fasilitas.find();
     res.json(data);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-router.post("/fasilitas", auth, async (req, res) => {
+// POST tambah fasilitas
+router.post("/fasilitas", upload.single("foto"), async (req, res) => {
   try {
-    const newData = new Fasilitas(req.body);
-    await newData.save();
-    res.status(201).json(newData);
+    const newFasilitas = new Fasilitas({
+      nama: req.body.nama,
+      deskripsi: req.body.deskripsi,
+      foto: req.file ? req.file.filename : null,
+    });
+    await newFasilitas.save();
+    res.json(newFasilitas);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
+// DELETE fasilitas
+router.delete("/fasilitas/:id", async (req, res) => {
+  try {
+    await Fasilitas.findByIdAndDelete(req.params.id);
+    res.json({ msg: "Fasilitas berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// UPDATE fasilitas
+router.put("/fasilitas/:id", upload.single("foto"), async (req, res) => {
+  try {
+    const updateData = {
+      nama: req.body.nama,
+      deskripsi: req.body.deskripsi,
+    };
+    if (req.file) updateData.foto = req.file.filename;
+
+    const fasilitas = await Fasilitas.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+    res.json(fasilitas);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // ---------- Struktur Organisasi ----------
 router.get("/struktur", async (req, res) => {
   try {
