@@ -111,8 +111,8 @@ router.delete("/profil/:id", auth, async (req, res) => {
   res.json({ message: "deleted" });
 });
 
-// ----------Ambil semua data VisiMisi ----------
-router.get("/", async (req, res) => {
+// ---------- VisiMisi ----------
+router.get("/visi-misi", async (req, res) => {
   try {
     const data = await VisiMisi.find();
     res.json(data);
@@ -121,8 +121,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Tambah data
-router.post("/", async (req, res) => {
+router.post("/visi-misi", auth, async (req, res) => {
   try {
     const newData = new VisiMisi(req.body);
     await newData.save();
@@ -132,8 +131,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ----------Ambil semua data Sambutan ----------
-router.get("/", async (req, res) => {
+// ---------- Sambutan ----------
+router.get("/sambutan", async (req, res) => {
   try {
     const data = await Sambutan.find();
     res.json(data);
@@ -142,8 +141,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Tambah data
-router.post("/", async (req, res) => {
+router.post("/sambutan", auth, async (req, res) => {
   try {
     const newData = new Sambutan(req.body);
     await newData.save();
@@ -153,8 +151,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ----------Ambil semua data Fasilitas ----------
-router.get("/", async (req, res) => {
+// ---------- Fasilitas ----------
+router.get("/fasilitas", async (req, res) => {
   try {
     const data = await Fasilitas.find();
     res.json(data);
@@ -163,8 +161,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Tambah data
-router.post("/", async (req, res) => {
+router.post("/fasilitas", auth, async (req, res) => {
   try {
     const newData = new Fasilitas(req.body);
     await newData.save();
@@ -174,8 +171,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ----------Ambil semua data Struktur Organisasi ----------
-router.get("/", async (req, res) => {
+// ---------- Struktur Organisasi ----------
+router.get("/struktur", async (req, res) => {
   try {
     const data = await StrukturOrganisasi.find();
     res.json(data);
@@ -184,17 +181,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Tambah data
-router.post("/", async (req, res) => {
+router.post("/struktur", auth, async (req, res) => {
   try {
-    const newData = new StruturOrganisasi(req.body);
+    const newData = new StrukturOrganisasi(req.body);
     await newData.save();
     res.status(201).json(newData);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-
 
 // ---------- Guru ----------
 router.get("/guru", async (req, res) => {
