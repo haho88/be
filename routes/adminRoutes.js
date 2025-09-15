@@ -10,7 +10,7 @@ import Admin from "../models/Admin.js";
 import Profil from "../models/Profil.js";
 import VisiMisi from "../models/profil/VisiMisi.js";
 import Sambutan from "../models/profil/Sambutan.js";
-import Fasilitas from "../models/profil/Fasilitas.js";
+import Fasilitas from "../models/Fasilitas.js";
 import StrukturOrganisasi from "../models/profil/StrukturOrganisasi.js";
 import Guru from "../models/Guru.js";
 import Staf from "../models/Staf.js";
