@@ -123,14 +123,6 @@ router.get("/visi-misi/all", async (req, res) => {
   }
 });
 
-router.get("/fasilitas/all", async (req, res) => {
-  try {
-    const data = await Profil.find({ type: "fasilitas" });
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
 router.get("/sambutan/all", async (req, res) => {
   try {
