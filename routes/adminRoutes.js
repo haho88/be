@@ -112,24 +112,58 @@ router.delete("/profil/:id", auth, async (req, res) => {
 });
 
 // ---------- VisiMisi ----------
-router.get("/visi-misi", async (req, res) => {
+// Creat VisiMisi
+router.post("/visimisi", upload.single("foto"), async (req, res) => {
+  try {
+    const newVisiMisi = new VisiMisi({
+      nama: req.body.nama,
+      deskripsi: req.body.deskripsi,
+      foto: req.file ? req.file.filename : null,
+    });
+    await newVisiMisi.save();
+    res.json({ message: "VisiMisi berhasil ditambahkan", data: newVisiMisi });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET semua VisiMisi
+router.get("/visimisi", async (req, res) => {
   try {
     const data = await VisiMisi.find();
     res.json(data);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-router.post("/visi-misi", auth, async (req, res) => {
+// UPDATE VisiMisi
+router.put("/visimisi/:id", upload.single("foto"), async (req, res) => {
   try {
-    const newData = new VisiMisi(req.body);
-    await newData.save();
-    res.status(201).json(newData);
+    const updateData = {
+      nama: req.body.nama,
+      deskripsi: req.body.deskripsi,
+    };
+    if (req.file) updateData.foto = req.file.filename;
+
+    const updated = await VisiMisi.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    res.json({ message: "VisiMisi berhasil diupdate", data: updated });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
+
+// DELETE VisiMisi
+router.delete("/visimisi/:id", async (req, res) => {
+  try {
+    await VisiMisi.findByIdAndDelete(req.params.id);
+    res.json({ message: "VisiMisi berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 // ---------- Sambutan ----------
 router.get("/sambutan", async (req, res) => {
