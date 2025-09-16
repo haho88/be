@@ -87,30 +87,83 @@ router.post("/upload", auth, upload.single("file"), (req, res) => {
 });
 
 // ========== CRUD GENERIC HELPERS (for clarity we implement separately) ===========
+// -------------- SEJARAH --------------- \\
+// Create
+router.post("/sejarah", async (req, res) => {
+  try {
+    const { isi } = req.body;
 
-// ---------- Profil ----------
-router.get("/profil", async (req, res) => {
-  const items = await Profil.find().sort({ createdAt: -1 });
-  res.json(items);
-});
-router.post("/profil", auth, upload.single("image"), async (req, res) => {
-  const { type, title, content } = req.body;
-  const image = req.file ? req.file.filename : undefined;
-  const doc = await Profil.create({ type, title, content, image });
-  res.json(doc);
-});
-router.put("/profil/:id", auth, upload.single("image"), async (req, res) => {
-  const { id } = req.params;
-  const body = req.body;
-  if (req.file) body.image = req.file.filename;
-  const u = await Profil.findByIdAndUpdate(id, body, { new: true });
-  res.json(u);
-});
-router.delete("/profil/:id", auth, async (req, res) => {
-  await Profil.findByIdAndDelete(req.params.id);
-  res.json({ message: "deleted" });
+    if (!isi) {
+      return res.status(400).json({ message: "Isi sejarah wajib diisi" });
+    }
+
+    // supaya cuma ada 1 sejarah → hapus dulu yang lama
+    await Sejarah.deleteMany();
+
+    const sejarah = new Sejarah({ isi });
+    await sejarah.save();
+
+    res.status(201).json({ message: "Sejarah berhasil ditambahkan", data: sejarah });
+  } catch (err) {
+    console.error("❌ Error tambah sejarah:", err);
+    res.status(500).json({ message: "Gagal menambahkan sejarah", error: err.message });
+  }
 });
 
+// Read all (ambil hanya 1)
+router.get("/sejarah", async (req, res) => {
+  try {
+    const sejarah = await Sejarah.find().sort({ createdAt: -1 });
+    res.json(sejarah);
+  } catch (err) {
+    console.error("❌ Error ambil sejarah:", err);
+    res.status(500).json({ message: "Gagal mengambil data sejarah", error: err.message });
+  }
+});
+
+// Read by ID
+router.get("/sejarah/:id", async (req, res) => {
+  try {
+    const sejarah = await Sejarah.findById(req.params.id);
+    if (!sejarah) return res.status(404).json({ message: "Sejarah tidak ditemukan" });
+    res.json(sejarah);
+  } catch (err) {
+    console.error("❌ Error ambil sejarah by ID:", err);
+    res.status(500).json({ message: "Gagal mengambil sejarah", error: err.message });
+  }
+});
+
+// Update
+router.put("/sejarah/:id", async (req, res) => {
+  try {
+    const { isi } = req.body;
+    const sejarah = await Sejarah.findByIdAndUpdate(
+      req.params.id,
+      { isi },
+      { new: true }
+    );
+
+    if (!sejarah) return res.status(404).json({ message: "Sejarah tidak ditemukan" });
+
+    res.json({ message: "Sejarah berhasil diperbarui", data: sejarah });
+  } catch (err) {
+    console.error("❌ Error update sejarah:", err);
+    res.status(500).json({ message: "Gagal memperbarui sejarah", error: err.message });
+  }
+});
+
+// Delete
+router.delete("/sejarah/:id", async (req, res) => {
+  try {
+    const sejarah = await Sejarah.findByIdAndDelete(req.params.id);
+    if (!sejarah) return res.status(404).json({ message: "Sejarah tidak ditemukan" });
+
+    res.json({ message: "Sejarah berhasil dihapus" });
+  } catch (err) {
+    console.error("❌ Error delete sejarah:", err);
+    res.status(500).json({ message: "Gagal menghapus sejarah", error: err.message });
+  }
+});
 
 // ---------- VisiMisi ----------
 // CREATE
