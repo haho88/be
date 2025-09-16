@@ -111,15 +111,19 @@ router.delete("/profil/:id", auth, async (req, res) => {
   res.json({ message: "deleted" });
 });
 
+
 // ---------- VisiMisi ----------
-// Creat VisiMisi
+// CREATE
 router.post("/visimisi", upload.single("foto"), async (req, res) => {
   try {
+    const { visi, misi } = req.body;
+
     const newVisiMisi = new VisiMisi({
-      nama: req.body.nama,
-      deskripsi: req.body.deskripsi,
+      visi,
+      misi: Array.isArray(misi) ? misi : [misi], // kalau cuma 1 tetap dijadikan array
       foto: req.file ? req.file.filename : null,
     });
+
     await newVisiMisi.save();
     res.json({ message: "VisiMisi berhasil ditambahkan", data: newVisiMisi });
   } catch (err) {
@@ -127,7 +131,7 @@ router.post("/visimisi", upload.single("foto"), async (req, res) => {
   }
 });
 
-// GET semua VisiMisi
+// READ
 router.get("/visimisi", async (req, res) => {
   try {
     const data = await VisiMisi.find();
@@ -137,23 +141,28 @@ router.get("/visimisi", async (req, res) => {
   }
 });
 
-// UPDATE VisiMisi
+// UPDATE
 router.put("/visimisi/:id", upload.single("foto"), async (req, res) => {
   try {
+    const { visi, misi } = req.body;
     const updateData = {
-      nama: req.body.nama,
-      deskripsi: req.body.deskripsi,
+      visi,
+      misi: Array.isArray(misi) ? misi : [misi],
     };
     if (req.file) updateData.foto = req.file.filename;
 
-    const updated = await VisiMisi.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    const updated = await VisiMisi.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
     res.json({ message: "VisiMisi berhasil diupdate", data: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// DELETE VisiMisi
+// DELETE
 router.delete("/visimisi/:id", async (req, res) => {
   try {
     await VisiMisi.findByIdAndDelete(req.params.id);
@@ -162,7 +171,6 @@ router.delete("/visimisi/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 
 // ---------- Sambutan ----------
