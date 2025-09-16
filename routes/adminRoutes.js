@@ -101,7 +101,7 @@ router.post("/sejarah", upload.single("image"), async (req, res) => {
     });
 
     await sejarah.save();
-    res.status(201).json({ message: "Sejarah berhasil ditambahkan", data: sambutan });
+    res.status(201).json({ message: "Sejarah berhasil ditambahkan", data: sejarah });
   } catch (err) {
     console.error("❌ Error Sejarah [POST]:", err); // <--- tambahkan ini
     res.status(500).json({ message: "Gagal menambahkan sejarah", error: err.message });
@@ -112,7 +112,7 @@ router.post("/sejarah", upload.single("image"), async (req, res) => {
 router.get("/sejarah", async (req, res) => {
   try {
     const sejarah = await Sejarah.find().sort({ createdAt: -1 });
-    res.json(sejarah;
+    res.json(sejarah);
   } catch (err) {
     console.error("❌ Error Sejarah [POST]:", err); // <--- tambahkan ini
     res.status(500).json({ message: "Gagal menambahkan sejarah", error: err.message });
