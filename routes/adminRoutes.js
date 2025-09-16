@@ -116,18 +116,23 @@ router.delete("/profil/:id", auth, async (req, res) => {
 // CREATE
 router.post("/visimisi", upload.single("foto"), async (req, res) => {
   try {
-    const { visi, misi } = req.body;
+    let { visi, misi } = req.body;
+
+    // kalau misi dikirim sebagai string, ubah jadi array
+    if (typeof misi === "string") {
+      misi = misi.split(/[.,;]/).map((s) => s.trim()).filter((s) => s !== "");
+    }
 
     const newVisiMisi = new VisiMisi({
       visi,
-      misi: Array.isArray(misi) ? misi : [misi], // kalau cuma 1 tetap dijadikan array
+      misi,
       foto: req.file ? req.file.filename : null,
     });
 
     await newVisiMisi.save();
     res.json({ message: "VisiMisi berhasil ditambahkan", data: newVisiMisi });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
