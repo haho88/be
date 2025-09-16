@@ -9,4 +9,4 @@ const sejarahSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Sejarah", sejarahSchema);
+export default mongoose.model("Sejarah", sejarahSchema);
