@@ -193,6 +193,7 @@ router.post("/sambutan", upload.single("image"), async (req, res) => {
     await sambutan.save();
     res.status(201).json({ message: "Sambutan berhasil ditambahkan", data: sambutan });
   } catch (err) {
+    console.error("❌ Error Sambutan [POST]:", err); // <--- tambahkan ini
     res.status(500).json({ message: "Gagal menambahkan sambutan", error: err.message });
   }
 });
@@ -203,7 +204,8 @@ router.get("/sambutan", async (req, res) => {
     const sambutan = await Sambutan.find().sort({ createdAt: -1 });
     res.json(sambutan);
   } catch (err) {
-    res.status(500).json({ message: "Gagal mengambil data sambutan", error: err.message });
+    console.error("❌ Error Sambutan [POST]:", err); // <--- tambahkan ini
+    res.status(500).json({ message: "Gagal menambahkan sambutan", error: err.message });
   }
 });
 
@@ -214,7 +216,8 @@ router.get("/sambutan/:id", async (req, res) => {
     if (!sambutan) return res.status(404).json({ message: "Sambutan tidak ditemukan" });
     res.json(sambutan);
   } catch (err) {
-    res.status(500).json({ message: "Gagal mengambil sambutan", error: err.message });
+    console.error("❌ Error Sambutan [POST]:", err); // <--- tambahkan ini
+    res.status(500).json({ message: "Gagal menambahkan sambutan", error: err.message });
   }
 });
 
@@ -233,7 +236,8 @@ router.put("/sambutan/:id", upload.single("image"), async (req, res) => {
 
     res.json({ message: "Sambutan berhasil diperbarui", data: sambutan });
   } catch (err) {
-    res.status(500).json({ message: "Gagal memperbarui sambutan", error: err.message });
+    console.error("❌ Error Sambutan [POST]:", err); // <--- tambahkan ini
+    res.status(500).json({ message: "Gagal menambahkan sambutan", error: err.message });
   }
 });
 
@@ -245,7 +249,8 @@ router.delete("/sambutan/:id", async (req, res) => {
 
     res.json({ message: "Sambutan berhasil dihapus" });
   } catch (err) {
-    res.status(500).json({ message: "Gagal menghapus sambutan", error: err.message });
+    console.error("❌ Error Sambutan [POST]:", err); // <--- tambahkan ini
+    res.status(500).json({ message: "Gagal menambahkan sambutan", error: err.message });
   }
 });
 
