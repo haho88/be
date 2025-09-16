@@ -2,7 +2,9 @@ const mongoose = require("mongoose");
 
 const sejarahSchema = new mongoose.Schema(
   {
-    isi: { type: String, required: true },
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    image: { type: String }, // opsional kalau pakai upload
   },
   { timestamps: true }
 );
