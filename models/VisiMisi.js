@@ -1,7 +1,7 @@
 // models/VisiMisi.js
 import mongoose from "mongoose";
 
-const VisiMisiSchema = new mongoose.Schema({
+const visimisiSchema = new mongoose.Schema({
   nama: { type: String, required: true },
   deskripsi: { type: String },
   foto: { type: String, required: true  },
