@@ -8,10 +8,10 @@ import fs from "fs";
 
 import Admin from "../models/Admin.js";
 import Profil from "../models/Profil.js";
-import VisiMisi from "../models/profil/VisiMisi.js";
-import Sambutan from "../models/profil/Sambutan.js";
+import VisiMisi from "../models/VisiMisi.js";
+import Sambutan from "../models/Sambutan.js";
 import Fasilitas from "../models/Fasilitas.js";
-import StrukturOrganisasi from "../models/profil/StrukturOrganisasi.js";
+import StrukturOrganisasi from "../models/StrukturOrganisasi.js";
 import Guru from "../models/Guru.js";
 import Staf from "../models/Staf.js";
 import Siswa from "../models/Siswa.js";
