@@ -179,22 +179,73 @@ router.delete("/visimisi/:id", async (req, res) => {
 
 
 // ---------- Sambutan ----------
-router.get("/sambutan", async (req, res) => {
+// Create
+router.post("/sambutan", upload.single("image"), async (req, res) => {
   try {
-    const data = await Sambutan.find();
-    res.json(data);
+    const { title, content } = req.body;
+
+    const sambutan = new Sambutan({
+      title,
+      content,
+      image: req.file ? req.file.filename : null,
+    });
+
+    await sambutan.save();
+    res.status(201).json({ message: "Sambutan berhasil ditambahkan", data: sambutan });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Gagal menambahkan sambutan", error: err.message });
   }
 });
 
-router.post("/sambutan", auth, async (req, res) => {
+// Read all
+router.get("/sambutan", async (req, res) => {
   try {
-    const newData = new Sambutan(req.body);
-    await newData.save();
-    res.status(201).json(newData);
+    const sambutan = await Sambutan.find().sort({ createdAt: -1 });
+    res.json(sambutan);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: "Gagal mengambil data sambutan", error: err.message });
+  }
+});
+
+// Read by ID
+router.get("/sambutan/:id", async (req, res) => {
+  try {
+    const sambutan = await Sambutan.findById(req.params.id);
+    if (!sambutan) return res.status(404).json({ message: "Sambutan tidak ditemukan" });
+    res.json(sambutan);
+  } catch (err) {
+    res.status(500).json({ message: "Gagal mengambil sambutan", error: err.message });
+  }
+});
+
+// Update
+router.put("/sambutan/:id", upload.single("image"), async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    const updateData = { title, content };
+
+    if (req.file) {
+      updateData.image = req.file.filename;
+    }
+
+    const sambutan = await Sambutan.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!sambutan) return res.status(404).json({ message: "Sambutan tidak ditemukan" });
+
+    res.json({ message: "Sambutan berhasil diperbarui", data: sambutan });
+  } catch (err) {
+    res.status(500).json({ message: "Gagal memperbarui sambutan", error: err.message });
+  }
+});
+
+// Delete
+router.delete("/sambutan/:id", async (req, res) => {
+  try {
+    const sambutan = await Sambutan.findByIdAndDelete(req.params.id);
+    if (!sambutan) return res.status(404).json({ message: "Sambutan tidak ditemukan" });
+
+    res.json({ message: "Sambutan berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json({ message: "Gagal menghapus sambutan", error: err.message });
   }
 });
 
