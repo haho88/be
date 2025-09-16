@@ -9,6 +9,6 @@ const sambutanSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Sambutan = mongoose.model("Sejarah", sambutanSchema);
+const Sambutan = mongoose.model("Sambutan", sambutanSchema);
 
 export default Sambutan; // ✅ export default
