@@ -10,6 +10,7 @@ import Admin from "../models/Admin.js";
 import Profil from "../models/Profil.js";
 import VisiMisi from "../models/VisiMisi.js";
 import Sambutan from "../models/Sambutan.js";
+import Sejarah from "../models/Sejarah.js";
 import Fasilitas from "../models/Fasilitas.js";
 import StrukturOrganisasi from "../models/StrukturOrganisasi.js";
 import Guru from "../models/Guru.js";
@@ -89,35 +90,32 @@ router.post("/upload", auth, upload.single("file"), (req, res) => {
 // ========== CRUD GENERIC HELPERS (for clarity we implement separately) ===========
 // -------------- SEJARAH --------------- \\
 // Create
-router.post("/sejarah", async (req, res) => {
+router.post("/sejarah", upload.single("image"), async (req, res) => {
   try {
-    const { isi } = req.body;
+    const { title, content } = req.body;
 
-    if (!isi) {
-      return res.status(400).json({ message: "Isi sejarah wajib diisi" });
-    }
+    const sejarah = new Sejarah({
+      title,
+      content,
+      image: req.file ? req.file.filename : null,
+    });
 
-    // supaya cuma ada 1 sejarah → hapus dulu yang lama
-    await Sejarah.deleteMany();
-
-    const sejarah = new Sejarah({ isi });
     await sejarah.save();
-
-    res.status(201).json({ message: "Sejarah berhasil ditambahkan", data: sejarah });
+    res.status(201).json({ message: "Sejarah berhasil ditambahkan", data: sambutan });
   } catch (err) {
-    console.error("❌ Error tambah sejarah:", err);
+    console.error("❌ Error Sejarah [POST]:", err); // <--- tambahkan ini
     res.status(500).json({ message: "Gagal menambahkan sejarah", error: err.message });
   }
 });
 
-// Read all (ambil hanya 1)
+// Read all
 router.get("/sejarah", async (req, res) => {
   try {
     const sejarah = await Sejarah.find().sort({ createdAt: -1 });
-    res.json(sejarah);
+    res.json(sejarah;
   } catch (err) {
-    console.error("❌ Error ambil sejarah:", err);
-    res.status(500).json({ message: "Gagal mengambil data sejarah", error: err.message });
+    console.error("❌ Error Sejarah [POST]:", err); // <--- tambahkan ini
+    res.status(500).json({ message: "Gagal menambahkan sejarah", error: err.message });
   }
 });
 
@@ -128,27 +126,28 @@ router.get("/sejarah/:id", async (req, res) => {
     if (!sejarah) return res.status(404).json({ message: "Sejarah tidak ditemukan" });
     res.json(sejarah);
   } catch (err) {
-    console.error("❌ Error ambil sejarah by ID:", err);
-    res.status(500).json({ message: "Gagal mengambil sejarah", error: err.message });
+    console.error("❌ Error Sejarah [POST]:", err); // <--- tambahkan ini
+    res.status(500).json({ message: "Gagal menambahkan sejarah", error: err.message });
   }
 });
 
 // Update
-router.put("/sejarah/:id", async (req, res) => {
+router.put("/sejarah/:id", upload.single("image"), async (req, res) => {
   try {
-    const { isi } = req.body;
-    const sejarah = await Sejarah.findByIdAndUpdate(
-      req.params.id,
-      { isi },
-      { new: true }
-    );
+    const { title, content } = req.body;
+    const updateData = { title, content };
 
+    if (req.file) {
+      updateData.image = req.file.filename;
+    }
+
+    const sejarah = await Sejarah.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!sejarah) return res.status(404).json({ message: "Sejarah tidak ditemukan" });
 
     res.json({ message: "Sejarah berhasil diperbarui", data: sejarah });
   } catch (err) {
-    console.error("❌ Error update sejarah:", err);
-    res.status(500).json({ message: "Gagal memperbarui sejarah", error: err.message });
+    console.error("❌ Error Sejarah [POST]:", err); // <--- tambahkan ini
+    res.status(500).json({ message: "Gagal menambahkan sejarah", error: err.message });
   }
 });
 
@@ -160,10 +159,13 @@ router.delete("/sejarah/:id", async (req, res) => {
 
     res.json({ message: "Sejarah berhasil dihapus" });
   } catch (err) {
-    console.error("❌ Error delete sejarah:", err);
-    res.status(500).json({ message: "Gagal menghapus sejarah", error: err.message });
+    console.error("❌ Error Sejarah [POST]:", err); // <--- tambahkan ini
+    res.status(500).json({ message: "Gagal menambahkan sejarah", error: err.message });
   }
 });
+
+
+
 
 // ---------- VisiMisi ----------
 // CREATE
