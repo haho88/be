@@ -1,6 +1,6 @@
 import mongoose from "mongoose";  // ✅ pakai import, bukan require
 
-const sejarahSchema = new mongoose.Schema(
+const sambutanSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     content: { type: String, required: true },
@@ -9,6 +9,6 @@ const sejarahSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Sejarah = mongoose.model("Sejarah", sejarahSchema);
+const Sambutan = mongoose.model("Sejarah", sambutanSchema);
 
-export default Sejarah; // ✅ export default
+export default Sambutan; // ✅ export default
