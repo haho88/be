@@ -167,7 +167,7 @@ router.delete("/sejarah/:id", async (req, res) => {
 
 
 
-// ---------- VisiMisi ----------
+// ---------- VISI-MISI ----------
 // CREATE
 router.post("/visimisi", upload.single("foto"), async (req, res) => {
   try {
@@ -233,7 +233,7 @@ router.delete("/visimisi/:id", async (req, res) => {
 });
 
 
-// ---------- Sambutan ----------
+// -------------------- SAMBUTAN ---------------------
 // Create
 router.post("/sambutan", upload.single("image"), async (req, res) => {
   try {
@@ -362,7 +362,7 @@ router.delete("/fasilitas/:id", async (req, res) => {
   }
 });
 
-// ---------- Struktur Organisasi ----------
+// ---------- STRUKTUR ORGANISASI ----------
 router.get("/struktur", async (req, res) => {
   try {
     const data = await StrukturOrganisasi.find();
@@ -382,7 +382,7 @@ router.post("/struktur", auth, async (req, res) => {
   }
 });
 
-// ---------- Guru ----------
+// -------------- GURU -----------------
 router.get("/guru", async (req, res) => {
   try {
     const items = await Guru.find().sort({ createdAt: -1 });
@@ -429,7 +429,7 @@ router.delete("/guru/:id", auth, async (req, res) => {
 });
 
 
-// ---------- Staf ----------
+// ------------------ STAF ------------------
 router.get("/staf", async (req, res) => {
   try {
     const items = await Staf.find().sort({ createdAt: -1 }); // ✅ pakai model Staf
@@ -471,7 +471,7 @@ router.delete("/staf/:id", auth, async (req, res) => {
 });
 
 
-// ---------- Siswa ----------
+// -------------- SISWA ----------------
 router.get("/siswa", async (req, res) => {
   const items = await Siswa.find().sort({ createdAt: -1 });
   res.json(items);
@@ -495,7 +495,7 @@ router.delete("/siswa/:id", auth, async (req, res) => {
   res.json({ message: "deleted" });
 });
 
-// ---------- Alumni ----------
+// ---------- ALUMNI ----------
 router.get("/alumni", async (req, res) => {
   const items = await Alumni.find().sort({ createdAt: -1 });
   res.json(items);
@@ -517,7 +517,7 @@ router.delete("/alumni/:id", auth, async (req, res) => {
   res.json({ message: "deleted" });
 });
 
-// ---------- Berita ----------
+// ---------- BERITA ----------
 router.get("/berita", async (req, res) => {
   try {
     const items = await Berita.find().sort({ createdAt: -1 });
@@ -584,7 +584,7 @@ router.delete("/berita/:id", auth, async (req, res) => {
 });
 
 
-// ---------- Galeri ----------
+// ---------- GALERI ----------
 router.get("/galeri", async (req, res) => {
   const items = await Galeri.find().sort({ createdAt: -1 });
   res.json(items);
@@ -617,7 +617,7 @@ router.delete("/galeri/:id", auth, async (req, res) => {
   res.json({ message: "deleted" });
 });
 
-// ---------- Pengumuman ----------
+// ---------- PENGUMUMAN ----------
 router.get("/pengumuman", async (req, res) => {
   const items = await Pengumuman.find().sort({ createdAt: -1 });
   res.json(items);
