@@ -362,8 +362,9 @@ router.delete("/fasilitas/:id", async (req, res) => {
 });
 
 // ---------- STRUKTUR ORGANISASI ----------
+
 // CREATE
-router.post("/struktur", upload.single("image"), async (req, res) => {
+router.post("/strukturorganisasi", upload.single("image"), async (req, res) => {
   try {
     const { nama, jabatan } = req.body;
     const struktur = new StrukturOrganisasi({
@@ -379,7 +380,7 @@ router.post("/struktur", upload.single("image"), async (req, res) => {
 });
 
 // READ (All)
-router.get("/struktur", async (req, res) => {
+router.get("/strukturorganisasi", async (req, res) => {
   try {
     const struktur = await StrukturOrganisasi.find();
     res.json(struktur);
@@ -389,7 +390,7 @@ router.get("/struktur", async (req, res) => {
 });
 
 // READ (By ID)
-router.get("/struktur/:id", async (req, res) => {
+router.get("/strukturorganisasi/:id", async (req, res) => {
   try {
     const struktur = await StrukturOrganisasi.findById(req.params.id);
     if (!struktur) return res.status(404).json({ message: "Data tidak ditemukan" });
@@ -400,7 +401,7 @@ router.get("/struktur/:id", async (req, res) => {
 });
 
 // UPDATE
-router.put("/struktur/:id", upload.single("image"), async (req, res) => {
+router.put("/strukturorganisasi/:id", upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
     const { nama, jabatan } = req.body;
@@ -408,7 +409,6 @@ router.put("/struktur/:id", upload.single("image"), async (req, res) => {
     const existing = await StrukturOrganisasi.findById(id);
     if (!existing) return res.status(404).json({ message: "Data tidak ditemukan" });
 
-    // Hapus gambar lama kalau upload baru
     if (req.file && existing.image) {
       const oldPath = path.join("uploads/struktur", existing.image);
       if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
@@ -426,7 +426,7 @@ router.put("/struktur/:id", upload.single("image"), async (req, res) => {
 });
 
 // DELETE
-router.delete("/struktur/:id", async (req, res) => {
+router.delete("/strukturorganisasi/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const existing = await StrukturOrganisasi.findById(id);
