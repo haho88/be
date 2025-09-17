@@ -7,7 +7,6 @@ import path from "path";
 import fs from "fs";
 
 import Admin from "../models/Admin.js";
-import Profil from "../models/Profil.js";
 import VisiMisi from "../models/VisiMisi.js";
 import Sambutan from "../models/Sambutan.js";
 import Sejarah from "../models/Sejarah.js";
