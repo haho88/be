@@ -363,22 +363,85 @@ router.delete("/fasilitas/:id", async (req, res) => {
 });
 
 // ---------- STRUKTUR ORGANISASI ----------
-router.get("/struktur", async (req, res) => {
+// CREATE
+router.post("/", upload.single("image"), async (req, res) => {
   try {
-    const data = await StrukturOrganisasi.find();
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const { nama, jabatan } = req.body;
+    const struktur = new StrukturOrganisasi({
+      nama,
+      jabatan,
+      image: req.file ? req.file.filename : null,
+    });
+    await struktur.save();
+    res.status(201).json(struktur);
+  } catch (error) {
+    res.status(500).json({ message: "Gagal menambah struktur", error });
   }
 });
 
-router.post("/struktur", auth, async (req, res) => {
+// READ (All)
+router.get("/", async (req, res) => {
   try {
-    const newData = new StrukturOrganisasi(req.body);
-    await newData.save();
-    res.status(201).json(newData);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+    const struktur = await StrukturOrganisasi.find();
+    res.json(struktur);
+  } catch (error) {
+    res.status(500).json({ message: "Gagal mengambil data struktur", error });
+  }
+});
+
+// READ (By ID)
+router.get("/:id", async (req, res) => {
+  try {
+    const struktur = await StrukturOrganisasi.findById(req.params.id);
+    if (!struktur) return res.status(404).json({ message: "Data tidak ditemukan" });
+    res.json(struktur);
+  } catch (error) {
+    res.status(500).json({ message: "Gagal mengambil detail struktur", error });
+  }
+});
+
+// UPDATE
+router.put("/:id", upload.single("image"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nama, jabatan } = req.body;
+
+    const existing = await StrukturOrganisasi.findById(id);
+    if (!existing) return res.status(404).json({ message: "Data tidak ditemukan" });
+
+    // Hapus gambar lama kalau upload baru
+    if (req.file && existing.image) {
+      const oldPath = path.join("uploads/struktur", existing.image);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    }
+
+    existing.nama = nama || existing.nama;
+    existing.jabatan = jabatan || existing.jabatan;
+    existing.image = req.file ? req.file.filename : existing.image;
+
+    await existing.save();
+    res.json(existing);
+  } catch (error) {
+    res.status(500).json({ message: "Gagal update struktur", error });
+  }
+});
+
+// DELETE
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const existing = await StrukturOrganisasi.findById(id);
+    if (!existing) return res.status(404).json({ message: "Data tidak ditemukan" });
+
+    if (existing.image) {
+      const oldPath = path.join("uploads/struktur", existing.image);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    }
+
+    await StrukturOrganisasi.findByIdAndDelete(id);
+    res.json({ message: "Data berhasil dihapus" });
+  } catch (error) {
+    res.status(500).json({ message: "Gagal menghapus struktur", error });
   }
 });
 
