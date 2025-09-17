@@ -363,7 +363,7 @@ router.delete("/fasilitas/:id", async (req, res) => {
 
 // ---------- STRUKTUR ORGANISASI ----------
 // CREATE
-router.post("/", upload.single("image"), async (req, res) => {
+router.post("/struktur", upload.single("image"), async (req, res) => {
   try {
     const { nama, jabatan } = req.body;
     const struktur = new StrukturOrganisasi({
@@ -379,7 +379,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 });
 
 // READ (All)
-router.get("/", async (req, res) => {
+router.get("/struktur", async (req, res) => {
   try {
     const struktur = await StrukturOrganisasi.find();
     res.json(struktur);
@@ -389,7 +389,7 @@ router.get("/", async (req, res) => {
 });
 
 // READ (By ID)
-router.get("/:id", async (req, res) => {
+router.get("/struktur/:id", async (req, res) => {
   try {
     const struktur = await StrukturOrganisasi.findById(req.params.id);
     if (!struktur) return res.status(404).json({ message: "Data tidak ditemukan" });
@@ -400,7 +400,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // UPDATE
-router.put("/:id", upload.single("image"), async (req, res) => {
+router.put("/struktur/:id", upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
     const { nama, jabatan } = req.body;
@@ -426,7 +426,7 @@ router.put("/:id", upload.single("image"), async (req, res) => {
 });
 
 // DELETE
-router.delete("/:id", async (req, res) => {
+router.delete("/struktur/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const existing = await StrukturOrganisasi.findById(id);
