@@ -9,4 +9,5 @@ const strukturSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("StrukturOrganisasi", strukturSchema);
+const StrukturOrganisasi = mongoose.model("StrukturOrganisasi", strukturSchema);
+export default StrukturOrganisasi;
