@@ -335,6 +335,19 @@ router.get("/fasilitas", async (req, res) => {
   }
 });
 
+// ✅ GET detail fasilitas by ID
+router.get("/fasilitas/:id", async (req, res) => {
+  try {
+    const fasilitas = await Fasilitas.findById(req.params.id);
+    if (!fasilitas) {
+      return res.status(404).json({ message: "Fasilitas tidak ditemukan" });
+    }
+    res.json(fasilitas);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // UPDATE fasilitas
 router.put("/fasilitas/:id", upload.single("foto"), async (req, res) => {
   try {
