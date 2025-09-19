@@ -548,7 +548,7 @@ router.delete("/staf/:id", auth, async (req, res) => {
 
 // -------------- SISWA ----------------
 // CREATE Siswa
-router.post("/", upload.single("foto"), async (req, res) => {
+router.post("/siswa", upload.single("foto"), async (req, res) => {
   try {
     const { nama, nis, kelas, jenisKelamin, alamat, tanggalLahir } = req.body;
 
@@ -570,7 +570,7 @@ router.post("/", upload.single("foto"), async (req, res) => {
 });
 
 // READ semua siswa
-router.get("/", async (req, res) => {
+router.get("/siswa", async (req, res) => {
   try {
     const siswa = await Siswa.find();
     res.json(siswa);
@@ -580,7 +580,7 @@ router.get("/", async (req, res) => {
 });
 
 // READ detail siswa
-router.get("/:id", async (req, res) => {
+router.get("/siswa/:id", async (req, res) => {
   try {
     const siswa = await Siswa.findById(req.params.id);
     if (!siswa) return res.status(404).json({ error: "Siswa tidak ditemukan" });
@@ -591,7 +591,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // UPDATE siswa
-router.put("/:id", upload.single("foto"), async (req, res) => {
+router.put("/siswa/:id", upload.single("foto"), async (req, res) => {
   try {
     const { nama, nis, kelas, jenisKelamin, alamat, tanggalLahir } = req.body;
 
@@ -599,7 +599,6 @@ router.put("/:id", upload.single("foto"), async (req, res) => {
     if (!siswa) return res.status(404).json({ error: "Siswa tidak ditemukan" });
 
     if (req.file) {
-      // hapus foto lama
       if (siswa.foto && fs.existsSync("uploads/siswa/" + siswa.foto)) {
         fs.unlinkSync("uploads/siswa/" + siswa.foto);
       }
@@ -620,6 +619,22 @@ router.put("/:id", upload.single("foto"), async (req, res) => {
   }
 });
 
+// DELETE siswa
+router.delete("/siswa/:id", async (req, res) => {
+  try {
+    const siswa = await Siswa.findById(req.params.id);
+    if (!siswa) return res.status(404).json({ error: "Siswa tidak ditemukan" });
+
+    if (siswa.foto && fs.existsSync("uploads/siswa/" + siswa.foto)) {
+      fs.unlinkSync("uploads/siswa/" + siswa.foto);
+    }
+
+    await siswa.deleteOne();
+    res.json({ message: "Siswa berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 // -------------- PRESTASI SISWA ----------------
