@@ -561,7 +561,7 @@ const uploadSiswa = multer({ storage: siswaStorage });
 
 // -------------- SISWA ----------------
 // CREATE Siswa
-router.post("/siswa", upload.single("foto"), async (req, res) => {
+router.post("/siswa", uploadSiswa.single("foto"), async (req, res) => {
   try {
     const { nama, nis, kelas, jenisKelamin, alamat, tanggalLahir } = req.body;
 
@@ -604,7 +604,7 @@ router.get("/siswa/:id", async (req, res) => {
 });
 
 // UPDATE siswa
-router.put("/siswa/:id", upload.single("foto"), async (req, res) => {
+router.put("/siswa/:id", uploadSiswa.single("foto"), async (req, res) => {
   try {
     const { nama, nis, kelas, jenisKelamin, alamat, tanggalLahir } = req.body;
 
@@ -612,8 +612,9 @@ router.put("/siswa/:id", upload.single("foto"), async (req, res) => {
     if (!siswa) return res.status(404).json({ error: "Siswa tidak ditemukan" });
 
     if (req.file) {
-      if (siswa.foto && fs.existsSync("uploads/siswa/" + siswa.foto)) {
-        fs.unlinkSync("uploads/siswa/" + siswa.foto);
+      const oldPath = path.join(UPLOAD_DIR, "siswa", siswa.foto || "");
+      if (siswa.foto && fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
       }
       siswa.foto = req.file.filename;
     }
@@ -638,8 +639,11 @@ router.delete("/siswa/:id", async (req, res) => {
     const siswa = await Siswa.findById(req.params.id);
     if (!siswa) return res.status(404).json({ error: "Siswa tidak ditemukan" });
 
-    if (siswa.foto && fs.existsSync("uploads/siswa/" + siswa.foto)) {
-      fs.unlinkSync("uploads/siswa/" + siswa.foto);
+    if (siswa.foto) {
+      const filePath = path.join(UPLOAD_DIR, "siswa", siswa.foto);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
 
     await siswa.deleteOne();
