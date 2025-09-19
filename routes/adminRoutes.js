@@ -15,6 +15,7 @@ import StrukturOrganisasi from "../models/StrukturOrganisasi.js";
 import Guru from "../models/Guru.js";
 import Staf from "../models/Staf.js";
 import Siswa from "../models/Siswa.js";
+import PrestasiSiswa from "../models/PrestasiSiswa.js";
 import Alumni from "../models/Alumni.js";
 import Berita from "../models/Berita.js";
 import Galeri from "../models/Galeri.js";
@@ -653,8 +654,97 @@ router.delete("/siswa/:id", async (req, res) => {
   }
 });
 
+// =============== PRESTASI SISWA ==================
+// ========== SETUP UPLOAD PRESTASI SISWA ==========
+const prestasiStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(UPLOAD_DIR, "prestasi-siswa");
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+  },
+});
+const uploadPrestasi = multer({ storage: prestasiStorage });
 
-// -------------- PRESTASI SISWA ----------------
+
+// CREATE Prestasi Siswa
+router.post("/prestasi-siswa", uploadPrestasi.single("sertifikat"), async (req, res) => {
+  try {
+    const { siswaId, namaPrestasi, tingkat, tahun, keterangan } = req.body;
+
+    const newPrestasi = new PrestasiSiswa({
+      siswaId,
+      namaPrestasi,
+      tingkat,
+      tahun,
+      keterangan,
+      sertifikat: req.file ? req.file.filename : null,
+    });
+
+    await newPrestasi.save();
+    res.status(201).json({ message: "Prestasi siswa berhasil ditambahkan", data: newPrestasi });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// READ semua prestasi
+router.get("/prestasi-siswa", async (req, res) => {
+  try {
+    const prestasi = await PrestasiSiswa.find().populate("siswaId", "nama nis kelas");
+    res.json(prestasi);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// UPDATE Prestasi
+router.put("/prestasi-siswa/:id", uploadPrestasi.single("sertifikat"), async (req, res) => {
+  try {
+    const { namaPrestasi, tingkat, tahun, keterangan, siswaId } = req.body;
+    const prestasi = await PrestasiSiswa.findById(req.params.id);
+    if (!prestasi) return res.status(404).json({ error: "Prestasi tidak ditemukan" });
+
+    if (req.file) {
+      const oldPath = path.join(UPLOAD_DIR, "prestasi-siswa", prestasi.sertifikat || "");
+      if (prestasi.sertifikat && fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      prestasi.sertifikat = req.file.filename;
+    }
+
+    prestasi.namaPrestasi = namaPrestasi || prestasi.namaPrestasi;
+    prestasi.tingkat = tingkat || prestasi.tingkat;
+    prestasi.tahun = tahun || prestasi.tahun;
+    prestasi.keterangan = keterangan || prestasi.keterangan;
+    prestasi.siswaId = siswaId || prestasi.siswaId;
+
+    await prestasi.save();
+    res.json({ message: "Prestasi berhasil diperbarui", data: prestasi });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// DELETE Prestasi
+router.delete("/prestasi-siswa/:id", async (req, res) => {
+  try {
+    const prestasi = await PrestasiSiswa.findById(req.params.id);
+    if (!prestasi) return res.status(404).json({ error: "Prestasi tidak ditemukan" });
+
+    if (prestasi.sertifikat) {
+      const filePath = path.join(UPLOAD_DIR, "prestasi-siswa", prestasi.sertifikat);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+
+    await prestasi.deleteOne();
+    res.json({ message: "Prestasi siswa berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // ---------- ALUMNI ----------
 router.get("/alumni", async (req, res) => {
