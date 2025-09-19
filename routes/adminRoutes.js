@@ -545,6 +545,19 @@ router.delete("/staf/:id", auth, async (req, res) => {
   }
 });
 
+// ========== SETUP UPLOAD SISWA (folder khusus) ==========
+const siswaStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(UPLOAD_DIR, "siswa");
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); // buat folder kalau belum ada
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+  },
+});
+const uploadSiswa = multer({ storage: siswaStorage });
 
 // -------------- SISWA ----------------
 // CREATE Siswa
