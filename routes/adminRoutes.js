@@ -547,28 +547,82 @@ router.delete("/staf/:id", auth, async (req, res) => {
 
 
 // -------------- SISWA ----------------
-router.get("/siswa", async (req, res) => {
-  const items = await Siswa.find().sort({ createdAt: -1 });
-  res.json(items);
+// CREATE Siswa
+router.post("/", upload.single("foto"), async (req, res) => {
+  try {
+    const { nama, nis, kelas, jenisKelamin, alamat, tanggalLahir } = req.body;
+
+    const newSiswa = new Siswa({
+      nama,
+      nis,
+      kelas,
+      jenisKelamin,
+      alamat,
+      tanggalLahir,
+      foto: req.file ? req.file.filename : null,
+    });
+
+    await newSiswa.save();
+    res.status(201).json({ message: "Siswa berhasil ditambahkan", data: newSiswa });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
-router.post("/siswa", auth, upload.single("foto"), async (req, res) => {
-  console.log("REQ BODY:", req.body);
-  console.log("REQ FILE:", req.file);
-  const obj = { ...req.body };
-  if (req.file) obj.foto = req.file.filename;
-  const doc = await Siswa.create(obj);
-  res.json(doc);
+
+// READ semua siswa
+router.get("/", async (req, res) => {
+  try {
+    const siswa = await Siswa.find();
+    res.json(siswa);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-router.put("/siswa/:id", auth, upload.single("foto"), async (req, res) => {
-  const body = { ...req.body };
-  if (req.file) body.foto = req.file.filename;
-  const u = await Siswa.findByIdAndUpdate(req.params.id, body, { new: true });
-  res.json(u);
+
+// READ detail siswa
+router.get("/:id", async (req, res) => {
+  try {
+    const siswa = await Siswa.findById(req.params.id);
+    if (!siswa) return res.status(404).json({ error: "Siswa tidak ditemukan" });
+    res.json(siswa);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-router.delete("/siswa/:id", auth, async (req, res) => {
-  await Siswa.findByIdAndDelete(req.params.id);
-  res.json({ message: "deleted" });
+
+// UPDATE siswa
+router.put("/:id", upload.single("foto"), async (req, res) => {
+  try {
+    const { nama, nis, kelas, jenisKelamin, alamat, tanggalLahir } = req.body;
+
+    const siswa = await Siswa.findById(req.params.id);
+    if (!siswa) return res.status(404).json({ error: "Siswa tidak ditemukan" });
+
+    if (req.file) {
+      // hapus foto lama
+      if (siswa.foto && fs.existsSync("uploads/siswa/" + siswa.foto)) {
+        fs.unlinkSync("uploads/siswa/" + siswa.foto);
+      }
+      siswa.foto = req.file.filename;
+    }
+
+    siswa.nama = nama || siswa.nama;
+    siswa.nis = nis || siswa.nis;
+    siswa.kelas = kelas || siswa.kelas;
+    siswa.jenisKelamin = jenisKelamin || siswa.jenisKelamin;
+    siswa.alamat = alamat || siswa.alamat;
+    siswa.tanggalLahir = tanggalLahir || siswa.tanggalLahir;
+
+    await siswa.save();
+    res.json({ message: "Data siswa berhasil diperbarui", data: siswa });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
+
+
+
+// -------------- PRESTASI SISWA ----------------
 
 // ---------- ALUMNI ----------
 router.get("/alumni", async (req, res) => {
