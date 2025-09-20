@@ -929,34 +929,62 @@ router.delete("/ppdb/info/:id", async (req, res) => {
 
 
 // ==================== PPDB FORMULIR ====================
-// CREATE - calon siswa daftar
-router.post("/ppdb/formulir_ppdb", async (req, res) => {
+// 🔹 Setup penyimpanan file
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/ppdb/ijazah"); // folder upload
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({ storage });
+
+// ================== ENDPOINT ================== //
+
+// ➡️ Create (daftar PPDB)
+router.post("/formulir", upload.single("ijazah"), async (req, res) => {
   try {
-    const newFormulir = new Formulir_PPDB(req.body);
+    const { nama, nisn, alamat, asalSekolah, noHp } = req.body;
+
+    const newFormulir = new FormulirPPDB({
+      nama,
+      nisn,
+      alamat,
+      asalSekolah,
+      noHp,
+      ijazah: req.file ? req.file.filename : null, // simpan nama file
+    });
+
     await newFormulir.save();
     res.status(201).json({ message: "Pendaftaran berhasil", data: newFormulir });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// READ - semua pendaftar
-router.get("/ppdb/formulir_ppdb", async (req, res) => {
+// ➡️ Read (lihat semua pendaftar)
+router.get("/formulir", async (req, res) => {
   try {
-    const data = await Formulir_PPDB.find();
+    const data = await FormulirPPDB.find().sort({ createdAt: -1 });
     res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// DELETE - hapus pendaftar
-router.delete("/ppdb/formulir_ppdb/:id", async (req, res) => {
+// ➡️ Delete (hapus pendaftar)
+router.delete("/formulir/:id", async (req, res) => {
   try {
-    await Formulir_PPDB.findByIdAndDelete(req.params.id);
-    res.json({ message: "Data formulir PPDB berhasil dihapus" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const { id } = req.params;
+    await FormulirPPDB.findByIdAndDelete(id);
+    res.json({ message: "Data berhasil dihapus" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
