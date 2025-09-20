@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const formulir_PPDBSchema = new mongoose.Schema(
+const Formulir_PPDBSchema = new mongoose.Schema(
   {
     nama: { type: String, required: true },
     nisn: { type: String, required: true },
@@ -12,4 +12,4 @@ const formulir_PPDBSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Formulir_PPDB", formulir_PPDBSchema);
+export default mongoose.model("Formulir_PPDB", Formulir_PPDBSchema);
