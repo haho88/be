@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import adminRoutes from "./routes/adminRoutes.js";
-import ppdbRoutes from "./routes/ppdbRoutes.js";
 import connectDB from "./config/db.js";
 import { registerIfNotExist } from "./controllers/adminController.js";
 
