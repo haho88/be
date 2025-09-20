@@ -929,23 +929,6 @@ router.delete("/ppdb/info/:id", async (req, res) => {
 
 
 // ==================== PPDB FORMULIR ====================
-// 🔹 Setup penyimpanan file
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/ppdb/ijazah"); // folder upload
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname)
-    );
-  },
-});
-
-const upload = multer({ storage });
-
-// ================== ENDPOINT ================== //
-
 // ➡️ Create (daftar PPDB)
 router.post("/formulir", upload.single("ijazah"), async (req, res) => {
   try {
