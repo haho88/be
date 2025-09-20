@@ -929,64 +929,32 @@ router.delete("/ppdb/info/:id", async (req, res) => {
 
 
 // ==================== PPDB FORMULIR ====================
-router.post("/ppdb/formulir", uploadFormulir.single("file"), async (req, res) => {
+// CREATE - calon siswa daftar
+router.post("/ppdb/formulir", async (req, res) => {
   try {
-    const newForm = new PPDB_Formulir({
-      ...req.body,
-      file: req.file ? req.file.filename : null,
-    });
-    await newForm.save();
-    res.status(201).json({ message: "Formulir PPDB ditambahkan", data: newForm });
+    const newFormulir = new FormulirPPDB(req.body);
+    await newFormulir.save();
+    res.status(201).json({ message: "Pendaftaran berhasil", data: newFormulir });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
 
+// READ - semua pendaftar
 router.get("/ppdb/formulir", async (req, res) => {
   try {
-    const data = await PPDB_Formulir.find();
+    const data = await FormulirPPDB.find();
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.put("/ppdb/formulir/:id", uploadFormulir.single("file"), async (req, res) => {
-  try {
-    const form = await PPDB_Formulir.findById(req.params.id);
-    if (!form) return res.status(404).json({ error: "Formulir tidak ditemukan" });
-
-    if (req.file) {
-      if (form.file) {
-        const oldPath = path.join(UPLOAD_DIR, "ppdb-formulir", form.file);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      }
-      form.file = req.file.filename;
-    }
-
-    form.tahunAjaran = req.body.tahunAjaran || form.tahunAjaran;
-    form.tipe = req.body.tipe || form.tipe;
-    form.link = req.body.link || form.link;
-
-    await form.save();
-    res.json({ message: "Formulir diperbarui", data: form });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
+// DELETE - hapus pendaftar
 router.delete("/ppdb/formulir/:id", async (req, res) => {
   try {
-    const form = await PPDB_Formulir.findById(req.params.id);
-    if (!form) return res.status(404).json({ error: "Formulir tidak ditemukan" });
-
-    if (form.file) {
-      const filePath = path.join(UPLOAD_DIR, "ppdb-formulir", form.file);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    }
-
-    await form.deleteOne();
-    res.json({ message: "Formulir dihapus" });
+    await FormulirPPDB.findByIdAndDelete(req.params.id);
+    res.json({ message: "Data formulir PPDB berhasil dihapus" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
