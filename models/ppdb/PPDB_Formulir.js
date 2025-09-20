@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
 
-const ppdbFormulirSchema = new mongoose.Schema(
+const formulirPPDBSchema = new mongoose.Schema(
   {
-    tahunAjaran: { type: String, required: true },
-    tipe: { type: String, enum: ["file", "link"], default: "link" },
-    link: { type: String },
-    file: { type: String }, // kalau upload PDF
+    nama: { type: String, required: true },
+    nisn: { type: String, required: true },
+    alamat: { type: String, required: true },
+    asalSekolah: { type: String, required: true },
+    noHp: { type: String, required: true },
+    ijazah: { type: String }, // opsional, simpan filename/path hasil upload
   },
   { timestamps: true }
 );
 
-export default mongoose.model("PPDB_Formulir", ppdbFormulirSchema);
+export default mongoose.model("FormulirPPDB", formulirPPDBSchema);
