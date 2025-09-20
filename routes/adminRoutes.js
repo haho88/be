@@ -20,7 +20,10 @@ import Alumni from "../models/Alumni.js";
 import Berita from "../models/Berita.js";
 import Galeri from "../models/Galeri.js";
 import Pengumuman from "../models/Pengumuman.js";
-import PPDB from "../models/PPDB.js";
+import PPDB_Info from "../models/ppdb/PPDB_Info.js";
+import PPDB_Formulir from "../models/ppdb/PPDB_Formulir.js";
+import PPDB_Jadwal from "../models/ppdb/PPDB_Jadwal.js";
+
 
 
 const router = express.Router();
@@ -886,55 +889,162 @@ router.delete("/pengumuman/:id", auth, async (req, res) => {
   res.json({ message: "deleted" });
 });
 
-// ---------- PPDB (pendaftar) ----------
-
-router.post("/ppdb/formulir", upload.single("dokumen"), async (req, res) => {
+// ==================== PPDB INFO ====================
+router.post("/ppdb/info", async (req, res) => {
   try {
-    const ppdb = new PPDB({
-      type: "Formulir",
-      nama: req.body.nama,
-      nisn: req.body.nisn,
-      tgl_lahir: req.body.tgl_lahir,
-      alamat: req.body.alamat,
-      nama_orangtua: req.body.nama_orangtua,
-      hp_orangtua: req.body.hp_orangtua,
-      dokumen: req.file ? req.file.filename : null,
-    });
-    await ppdb.save();
-    res.json({ message: "Pendaftaran berhasil", data: ppdb });
+    const data = new PPDB_Info(req.body);
+    await data.save();
+    res.status(201).json({ message: "Info PPDB ditambahkan", data });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Gagal simpan data" });
+    res.status(400).json({ error: err.message });
   }
 });
 
-// ADMIN GET ALL
-router.get("/ppdb", auth, async (req, res) => {
+router.get("/ppdb/info", async (req, res) => {
   try {
-    const data = await PPDB.find().sort({ createdAt: -1 });
+    const data = await PPDB_Info.find();
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: "Gagal ambil data" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// ADMIN UPDATE
-router.put("/ppdb/:id", auth, async (req, res) => {
+router.put("/ppdb/info/:id", async (req, res) => {
   try {
-    const updated = await PPDB.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
+    const data = await PPDB_Info.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ message: "Info PPDB diperbarui", data });
   } catch (err) {
-    res.status(500).json({ error: "Gagal update data" });
+    res.status(400).json({ error: err.message });
   }
 });
 
-// ADMIN DELETE
-router.delete("/ppdb/:id", auth, async (req, res) => {
+router.delete("/ppdb/info/:id", async (req, res) => {
   try {
-    await PPDB.findByIdAndDelete(req.params.id);
-    res.json({ message: "Data berhasil dihapus" });
+    await PPDB_Info.findByIdAndDelete(req.params.id);
+    res.json({ message: "Info PPDB dihapus" });
   } catch (err) {
-    res.status(500).json({ error: "Gagal hapus data" });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// ==================== PPDB FORMULIR ====================
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+const ppdbStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(UPLOAD_DIR, "ppdb-formulir");
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+  },
+});
+const uploadFormulir = multer({ storage: ppdbStorage });
+
+router.post("/ppdb/formulir", uploadFormulir.single("file"), async (req, res) => {
+  try {
+    const newForm = new PPDB_Formulir({
+      ...req.body,
+      file: req.file ? req.file.filename : null,
+    });
+    await newForm.save();
+    res.status(201).json({ message: "Formulir PPDB ditambahkan", data: newForm });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.get("/ppdb/formulir", async (req, res) => {
+  try {
+    const data = await PPDB_Formulir.find();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/ppdb/formulir/:id", uploadFormulir.single("file"), async (req, res) => {
+  try {
+    const form = await PPDB_Formulir.findById(req.params.id);
+    if (!form) return res.status(404).json({ error: "Formulir tidak ditemukan" });
+
+    if (req.file) {
+      if (form.file) {
+        const oldPath = path.join(UPLOAD_DIR, "ppdb-formulir", form.file);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+      form.file = req.file.filename;
+    }
+
+    form.tahunAjaran = req.body.tahunAjaran || form.tahunAjaran;
+    form.tipe = req.body.tipe || form.tipe;
+    form.link = req.body.link || form.link;
+
+    await form.save();
+    res.json({ message: "Formulir diperbarui", data: form });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete("/ppdb/formulir/:id", async (req, res) => {
+  try {
+    const form = await PPDB_Formulir.findById(req.params.id);
+    if (!form) return res.status(404).json({ error: "Formulir tidak ditemukan" });
+
+    if (form.file) {
+      const filePath = path.join(UPLOAD_DIR, "ppdb-formulir", form.file);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+
+    await form.deleteOne();
+    res.json({ message: "Formulir dihapus" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// ==================== PPDB JADWAL ====================
+router.post("/ppdb/jadwal", async (req, res) => {
+  try {
+    const data = new PPDB_Jadwal(req.body);
+    await data.save();
+    res.status(201).json({ message: "Jadwal seleksi ditambahkan", data });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.get("/ppdb/jadwal", async (req, res) => {
+  try {
+    const data = await PPDB_Jadwal.find();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/ppdb/jadwal/:id", async (req, res) => {
+  try {
+    const data = await PPDB_Jadwal.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ message: "Jadwal diperbarui", data });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete("/ppdb/jadwal/:id", async (req, res) => {
+  try {
+    await PPDB_Jadwal.findByIdAndDelete(req.params.id);
+    res.json({ message: "Jadwal dihapus" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
