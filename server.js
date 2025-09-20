@@ -45,10 +45,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/api/admin", adminRoutes);
-app.use("/api/admin/ppdb", ppdbRoutes);
 
-// supaya file bisa diakses frontend
-app.use("/uploads/ppdb/ijazah", express.static("uploads/ppdb/ijazah"));
 
 // DB connect + admin default
 connectDB().then(() => {
