@@ -930,7 +930,7 @@ router.delete("/ppdb/info/:id", async (req, res) => {
 
 // ==================== PPDB FORMULIR ====================
 // CREATE - calon siswa daftar
-router.post("/ppdb/formulir", async (req, res) => {
+router.post("/ppdb/formulir_ppdb", async (req, res) => {
   try {
     const newFormulir = new Formulir_PPDB(req.body);
     await newFormulir.save();
@@ -941,7 +941,7 @@ router.post("/ppdb/formulir", async (req, res) => {
 });
 
 // READ - semua pendaftar
-router.get("/ppdb/formulir", async (req, res) => {
+router.get("/ppdb/formulir_ppdb", async (req, res) => {
   try {
     const data = await Formulir_PPDB.find();
     res.json(data);
@@ -951,7 +951,7 @@ router.get("/ppdb/formulir", async (req, res) => {
 });
 
 // DELETE - hapus pendaftar
-router.delete("/ppdb/formulir/:id", async (req, res) => {
+router.delete("/ppdb/formulir_ppdb/:id", async (req, res) => {
   try {
     await Formulir_PPDB.findByIdAndDelete(req.params.id);
     res.json({ message: "Data formulir PPDB berhasil dihapus" });
