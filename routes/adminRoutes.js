@@ -21,7 +21,7 @@ import Berita from "../models/Berita.js";
 import Galeri from "../models/Galeri.js";
 import Pengumuman from "../models/Pengumuman.js";
 import PPDB_Info from "../models/ppdb/PPDB_Info.js";
-import PPDB_Formulir from "../models/PPDB_Formulir.js";
+import FormulirPPDB from "../models/PPDB_Formulir.js";
 import PPDB_Jadwal from "../models/ppdb/PPDB_Jadwal.js";
 
 
