@@ -951,6 +951,16 @@ router.post("/formulir", upload.single("ijazah"), async (req, res) => {
 });
 
 // ➡️ Read (lihat semua pendaftar)
+router.get("/formulir", async (req, res) => {
+  try {
+    const data = await FormulirPPDB.find().sort({ createdAt: -1 }); // urut terbaru dulu
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ➡️ Read by ID (lihat detail 1 pendaftar)
 router.get("/formulir/:id", async (req, res) => {
   try {
     const data = await FormulirPPDB.findById(req.params.id);
