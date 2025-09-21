@@ -951,9 +951,10 @@ router.post("/formulir", upload.single("ijazah"), async (req, res) => {
 });
 
 // ➡️ Read (lihat semua pendaftar)
-router.get("/formulir", async (req, res) => {
+router.get("/formulir/:id", async (req, res) => {
   try {
-    const data = await FormulirPPDB.find().sort({ createdAt: -1 });
+    const data = await FormulirPPDB.findById(req.params.id);
+    if (!data) return res.status(404).json({ error: "Data tidak ditemukan" });
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -964,7 +965,15 @@ router.get("/formulir", async (req, res) => {
 router.delete("/formulir/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    await FormulirPPDB.findByIdAndDelete(id);
+    const form = await FormulirPPDB.findByIdAndDelete(id);
+
+    if (!form) return res.status(404).json({ error: "Data tidak ditemukan" });
+
+    if (form.ijazah) {
+      const filePath = path.join("uploads", form.ijazah);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+
     res.json({ message: "Data berhasil dihapus" });
   } catch (error) {
     res.status(500).json({ error: error.message });
