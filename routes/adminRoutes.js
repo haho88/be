@@ -41,7 +41,6 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${Math.round(Math.random()*1e9)}${ext}`);
   }
 });
-const upload = multer({ storage });
 
 // ========== AUTH MIDDLEWARE ===========
 const auth = (req, res, next) => {
