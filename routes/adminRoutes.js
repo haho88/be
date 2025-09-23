@@ -28,7 +28,7 @@ import upload from "../middleware/upload.js";
 
 
 const router = express.Router();
-const UPLOAD_DIR = "uploads";
+
 
 // ========== MULTER SETUP ===========
 const UPLOAD_DIR = "uploads";
@@ -88,8 +88,11 @@ router.post("/login", async (req, res) => {
 
 // ========== UPLOAD ENDPOINT ===========
 router.post("/upload", auth, upload.single("file"), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: "No file" });
-  res.json({ filename: req.file.filename, path: `/uploads/${req.file.filename}` });
+  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+  res.json({
+    filename: req.file.filename,
+    path: `/uploads/${req.file.filename}`,
+  });
 });
 
 // ========== CRUD GENERIC HELPERS (for clarity we implement separately) ===========
