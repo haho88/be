@@ -28,6 +28,7 @@ import upload from "../middleware/upload.js";
 
 
 const router = express.Router();
+const UPLOAD_DIR = "uploads";
 
 // ========== MULTER SETUP ===========
 const UPLOAD_DIR = "uploads";
