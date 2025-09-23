@@ -23,6 +23,7 @@ import Pengumuman from "../models/Pengumuman.js";
 import PPDB_Info from "../models/ppdb/PPDB_Info.js";
 import FormulirPPDB from "../models/PPDB_Formulir.js";
 import PPDB_Jadwal from "../models/ppdb/PPDB_Jadwal.js";
+import upload from "../middleware/upload.js";
 
 
 
