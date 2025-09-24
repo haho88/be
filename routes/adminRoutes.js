@@ -719,10 +719,28 @@ const prestasiStorage = multer.diskStorage({
 const uploadPrestasi = multer({ storage: prestasiStorage });
 
 
+// ======================= PRESTASI SISWA ======================= //
+
 // CREATE Prestasi Siswa
-router.post("/prestasi-siswa", uploadPrestasi.single("sertifikat"), async (req, res) => {
+router.post("/prestasi-siswa", upload.single("sertifikat"), async (req, res) => {
   try {
     const { siswaId, namaPrestasi, tingkat, tahun, keterangan } = req.body;
+
+    let sertifikatUrl = null;
+    let localFile = null;
+
+    if (req.file) {
+      try {
+        // ✅ Upload ke Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+          folder: "mtsmuhcil/prestasi-siswa",
+        });
+        sertifikatUrl = uploadResult.secure_url;
+      } catch (err) {
+        // ✅ Fallback simpan nama file lokal
+        localFile = req.file.filename;
+      }
+    }
 
     const newPrestasi = new PrestasiSiswa({
       siswaId,
@@ -730,11 +748,15 @@ router.post("/prestasi-siswa", uploadPrestasi.single("sertifikat"), async (req, 
       tingkat,
       tahun,
       keterangan,
-      sertifikat: req.file ? req.file.filename : null,
+      sertifikat: sertifikatUrl,
+      fileLokal: localFile,
     });
 
     await newPrestasi.save();
-    res.status(201).json({ message: "Prestasi siswa berhasil ditambahkan", data: newPrestasi });
+    res.status(201).json({
+      message: "✅ Prestasi siswa berhasil ditambahkan",
+      data: newPrestasi,
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -751,16 +773,24 @@ router.get("/prestasi-siswa", async (req, res) => {
 });
 
 // UPDATE Prestasi
-router.put("/prestasi-siswa/:id", uploadPrestasi.single("sertifikat"), async (req, res) => {
+router.put("/prestasi-siswa/:id", upload.single("sertifikat"), async (req, res) => {
   try {
     const { namaPrestasi, tingkat, tahun, keterangan, siswaId } = req.body;
     const prestasi = await PrestasiSiswa.findById(req.params.id);
-    if (!prestasi) return res.status(404).json({ error: "Prestasi tidak ditemukan" });
+    if (!prestasi) return res.status(404).json({ error: "❌ Prestasi tidak ditemukan" });
 
     if (req.file) {
-      const oldPath = path.join(UPLOAD_DIR, "prestasi-siswa", prestasi.sertifikat || "");
-      if (prestasi.sertifikat && fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      prestasi.sertifikat = req.file.filename;
+      try {
+        // ✅ Upload baru ke Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+          folder: "mtsmuhcil/prestasi-siswa",
+        });
+        prestasi.sertifikat = uploadResult.secure_url;
+        prestasi.fileLokal = null; // reset kalau sudah berhasil upload cloudinary
+      } catch (err) {
+        // ✅ Fallback lokal
+        prestasi.fileLokal = req.file.filename;
+      }
     }
 
     prestasi.namaPrestasi = namaPrestasi || prestasi.namaPrestasi;
@@ -770,7 +800,7 @@ router.put("/prestasi-siswa/:id", uploadPrestasi.single("sertifikat"), async (re
     prestasi.siswaId = siswaId || prestasi.siswaId;
 
     await prestasi.save();
-    res.json({ message: "Prestasi berhasil diperbarui", data: prestasi });
+    res.json({ message: "✅ Prestasi berhasil diperbarui", data: prestasi });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -780,19 +810,21 @@ router.put("/prestasi-siswa/:id", uploadPrestasi.single("sertifikat"), async (re
 router.delete("/prestasi-siswa/:id", async (req, res) => {
   try {
     const prestasi = await PrestasiSiswa.findById(req.params.id);
-    if (!prestasi) return res.status(404).json({ error: "Prestasi tidak ditemukan" });
+    if (!prestasi) return res.status(404).json({ error: "❌ Prestasi tidak ditemukan" });
 
-    if (prestasi.sertifikat) {
-      const filePath = path.join(UPLOAD_DIR, "prestasi-siswa", prestasi.sertifikat);
+    // ✅ (Optional) kalau mau hapus file lokal juga
+    if (prestasi.fileLokal) {
+      const filePath = path.join(UPLOAD_DIR, "prestasi-siswa", prestasi.fileLokal);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
     await prestasi.deleteOne();
-    res.json({ message: "Prestasi siswa berhasil dihapus" });
+    res.json({ message: "✅ Prestasi siswa berhasil dihapus" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 // ---------- ALUMNI ----------
