@@ -24,6 +24,7 @@ import PPDB_Info from "../models/ppdb/PPDB_Info.js";
 import FormulirPPDB from "../models/PPDB_Formulir.js";
 import PPDB_Jadwal from "../models/ppdb/PPDB_Jadwal.js";
 import upload from "../middleware/upload.js";
+import cloudinary from "../config/cloudinary.js"; // pastikan config sudah ada
 
 
 
@@ -321,13 +322,34 @@ router.delete("/sambutan/:id", async (req, res) => {
 // CREATE fasilitas
 router.post("/fasilitas", upload.single("foto"), async (req, res) => {
   try {
+    let imageUrl = null;
+    let localFile = null;
+
+    if (req.file) {
+      try {
+        // ✅ Upload ke Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+          folder: "mtsmuhcil/fasilitas",
+        });
+        imageUrl = uploadResult.secure_url;
+      } catch (err) {
+        // ✅ Jika gagal ke Cloudinary, simpan ke lokal
+        localFile = req.file.filename;
+      }
+    }
+
     const newFasilitas = new Fasilitas({
       nama: req.body.nama,
       deskripsi: req.body.deskripsi,
-      foto: req.file ? req.file.filename : null,
+      image: imageUrl,
+      foto: localFile,
     });
+
     await newFasilitas.save();
-    res.json({ message: "Fasilitas berhasil ditambahkan", data: newFasilitas });
+    res.json({
+      message: "✅ Fasilitas berhasil ditambahkan",
+      data: newFasilitas,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -348,7 +370,7 @@ router.get("/fasilitas/:id", async (req, res) => {
   try {
     const fasilitas = await Fasilitas.findById(req.params.id);
     if (!fasilitas) {
-      return res.status(404).json({ message: "Fasilitas tidak ditemukan" });
+      return res.status(404).json({ message: "❌ Fasilitas tidak ditemukan" });
     }
     res.json(fasilitas);
   } catch (err) {
@@ -363,10 +385,30 @@ router.put("/fasilitas/:id", upload.single("foto"), async (req, res) => {
       nama: req.body.nama,
       deskripsi: req.body.deskripsi,
     };
-    if (req.file) updateData.foto = req.file.filename;
 
-    const updated = await Fasilitas.findByIdAndUpdate(req.params.id, updateData, { new: true });
-    res.json({ message: "Fasilitas berhasil diupdate", data: updated });
+    if (req.file) {
+      try {
+        // ✅ Upload baru ke Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+          folder: "mtsmuhcil/fasilitas",
+        });
+        updateData.image = uploadResult.secure_url;
+      } catch (err) {
+        // ✅ Fallback simpan nama file lokal
+        updateData.foto = req.file.filename;
+      }
+    }
+
+    const updated = await Fasilitas.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    res.json({
+      message: "✅ Fasilitas berhasil diupdate",
+      data: updated,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -376,7 +418,7 @@ router.put("/fasilitas/:id", upload.single("foto"), async (req, res) => {
 router.delete("/fasilitas/:id", async (req, res) => {
   try {
     await Fasilitas.findByIdAndDelete(req.params.id);
-    res.json({ message: "Fasilitas berhasil dihapus" });
+    res.json({ message: "✅ Fasilitas berhasil dihapus" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
