@@ -763,12 +763,15 @@ router.post("/prestasi-siswa", upload.single("sertifikat"), async (req, res) => 
 });
 
 // READ semua prestasi
-router.get("/prestasi-siswa", async (req, res) => {
+router.get("/prestasi-siswa/:id", async (req, res) => {
   try {
-    const prestasi = await PrestasiSiswa.find().populate("siswaId", "nama nis kelas");
+    const prestasi = await Prestasi.findById(req.params.id).populate("siswaId");
+    if (!prestasi) {
+      return res.status(404).json({ message: "Prestasi tidak ditemukan" });
+    }
     res.json(prestasi);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: "Error ambil detail prestasi", error: err.message });
   }
 });
 
