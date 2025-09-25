@@ -762,18 +762,31 @@ router.post("/prestasi-siswa", upload.single("sertifikat"), async (req, res) => 
   }
 });
 
+
 // READ semua prestasi
+router.get("/prestasi-siswa", async (req, res) => {
+  try {
+    const prestasi = await PrestasiSiswa.find().populate("siswaId", "nama nis kelas");
+    res.json(prestasi);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// READ detail prestasi by ID
 router.get("/prestasi-siswa/:id", async (req, res) => {
   try {
-    const prestasi = await Prestasi.findById(req.params.id).populate("siswaId");
+    const prestasi = await PrestasiSiswa.findById(req.params.id).populate("siswaId");
     if (!prestasi) {
-      return res.status(404).json({ message: "Prestasi tidak ditemukan" });
+      return res.status(404).json({ message: "❌ Prestasi tidak ditemukan" });
     }
     res.json(prestasi);
   } catch (err) {
     res.status(500).json({ message: "Error ambil detail prestasi", error: err.message });
   }
 });
+
 
 // UPDATE Prestasi
 router.put("/prestasi-siswa/:id", upload.single("sertifikat"), async (req, res) => {
@@ -809,6 +822,7 @@ router.put("/prestasi-siswa/:id", upload.single("sertifikat"), async (req, res) 
   }
 });
 
+
 // DELETE Prestasi
 router.delete("/prestasi-siswa/:id", async (req, res) => {
   try {
@@ -827,6 +841,27 @@ router.delete("/prestasi-siswa/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+// DELETE Prestasi
+router.delete("/prestasi-siswa/:id", async (req, res) => {
+  try {
+    const prestasi = await PrestasiSiswa.findById(req.params.id);
+    if (!prestasi) return res.status(404).json({ error: "❌ Prestasi tidak ditemukan" });
+
+    // ✅ (Optional) kalau mau hapus file lokal juga
+    if (prestasi.fileLokal) {
+      const filePath = path.join(UPLOAD_DIR, "prestasi-siswa", prestasi.fileLokal);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+
+    await prestasi.deleteOne();
+    res.json({ message: "✅ Prestasi siswa berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 
 
