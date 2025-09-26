@@ -8,7 +8,7 @@ const formulirPPDBSchema = new mongoose.Schema(
     asalSekolah: { type: String, required: true },
     noHp: { type: String, required: true },
     ijazah: { type: String }, // opsional, simpan filename/path hasil upload
-    ijazahPublicId: { type: String }, // ID file Cloudinary
+    
   },
   { timestamps: true }
 );
