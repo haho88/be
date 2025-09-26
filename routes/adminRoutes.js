@@ -1107,11 +1107,12 @@ router.get("/formulir/:id", async (req, res) => {
 // ➡️ Delete
 router.delete("/formulir/:id", async (req, res) => {
   try {
-    const form = await FormulirPPDB.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    const form = await FormulirPPDB.findByIdAndDelete(id);
 
     if (!form) return res.status(404).json({ error: "Data tidak ditemukan" });
 
-    // hapus file dari Cloudinary
+    // ✅ hapus dari Cloudinary kalau ada
     if (form.ijazahPublicId) {
       await cloudinary.uploader.destroy(form.ijazahPublicId);
     }
