@@ -1045,7 +1045,7 @@ router.delete("/ppdb/info/:id", async (req, res) => {
 
 
 // ==================== PPDB FORMULIR ====================
-/ ➡️ Create (daftar PPDB)
+// ➡️ Create (daftar PPDB)
 router.post("/formulir", upload.single("ijazah"), async (req, res) => {
   try {
     const { nama, nisn, alamat, asalSekolah, noHp } = req.body;
