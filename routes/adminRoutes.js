@@ -1045,6 +1045,44 @@ router.delete("/ppdb/info/:id", async (req, res) => {
 
 
 // ==================== PPDB FORMULIR ====================
+/ ➡️ Create (daftar PPDB)
+router.post("/formulir", upload.single("ijazah"), async (req, res) => {
+  try {
+    const { nama, nisn, alamat, asalSekolah, noHp } = req.body;
+
+    let ijazahUrl = null;
+    let ijazahPublicId = null;
+
+    // ✅ upload ke Cloudinary kalau ada file
+    if (req.file) {
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        folder: "ppdb_ijazah", // folder di Cloudinary
+      });
+
+      ijazahUrl = uploadResult.secure_url;
+      ijazahPublicId = uploadResult.public_id;
+
+      // hapus file lokal setelah diupload
+      fs.unlinkSync(req.file.path);
+    }
+
+    const newFormulir = new FormulirPPDB({
+      nama,
+      nisn,
+      alamat,
+      asalSekolah,
+      noHp,
+      ijazah: ijazahUrl,
+      ijazahPublicId,
+    });
+
+    await newFormulir.save();
+    res.status(201).json({ message: "Pendaftaran berhasil", data: newFormulir });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ➡️ Read (lihat semua pendaftar)
 router.get("/formulir", async (req, res) => {
   try {
@@ -1055,7 +1093,7 @@ router.get("/formulir", async (req, res) => {
   }
 });
 
-// ➡️ Read by ID (lihat detail 1 pendaftar)
+// ➡️ Read by ID
 router.get("/formulir/:id", async (req, res) => {
   try {
     const data = await FormulirPPDB.findById(req.params.id);
@@ -1066,14 +1104,14 @@ router.get("/formulir/:id", async (req, res) => {
   }
 });
 
-// ➡️ Delete (hapus pendaftar + hapus file Cloudinary)
+// ➡️ Delete
 router.delete("/formulir/:id", async (req, res) => {
   try {
-    const { id } = req.params;
-    const form = await FormulirPPDB.findByIdAndDelete(id);
+    const form = await FormulirPPDB.findByIdAndDelete(req.params.id);
 
     if (!form) return res.status(404).json({ error: "Data tidak ditemukan" });
 
+    // hapus file dari Cloudinary
     if (form.ijazahPublicId) {
       await cloudinary.uploader.destroy(form.ijazahPublicId);
     }
@@ -1083,6 +1121,7 @@ router.delete("/formulir/:id", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 // ==================== PPDB JADWAL ====================
