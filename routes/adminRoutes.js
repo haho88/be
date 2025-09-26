@@ -1051,7 +1051,6 @@ router.post("/formulir", upload.single("ijazah"), async (req, res) => {
     const { nama, nisn, alamat, asalSekolah, noHp } = req.body;
 
     let ijazahUrl = null;
-    let ijazahPublicId = null;
 
     // ✅ upload ke Cloudinary kalau ada file
     if (req.file) {
@@ -1060,8 +1059,7 @@ router.post("/formulir", upload.single("ijazah"), async (req, res) => {
       });
 
       ijazahUrl = uploadResult.secure_url;
-      ijazahPublicId = uploadResult.public_id;
-
+     
       // hapus file lokal setelah diupload
       fs.unlinkSync(req.file.path);
     }
@@ -1073,7 +1071,7 @@ router.post("/formulir", upload.single("ijazah"), async (req, res) => {
       asalSekolah,
       noHp,
       ijazah: ijazahUrl,
-      ijazahPublicId,
+      
     });
 
     await newFormulir.save();
