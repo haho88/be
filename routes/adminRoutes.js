@@ -1060,8 +1060,6 @@ router.post("/formulir", upload.single("ijazah"), async (req, res) => {
 
       ijazahUrl = uploadResult.secure_url;
      
-      // hapus file lokal setelah diupload
-      fs.unlinkSync(req.file.path);
     }
 
     const newFormulir = new FormulirPPDB({
@@ -1110,11 +1108,7 @@ router.delete("/formulir/:id", async (req, res) => {
 
     if (!form) return res.status(404).json({ error: "Data tidak ditemukan" });
 
-    // ✅ hapus dari Cloudinary kalau ada
-    if (form.ijazahPublicId) {
-      await cloudinary.uploader.destroy(form.ijazahPublicId);
-    }
-
+   
     res.json({ message: "Data berhasil dihapus" });
   } catch (error) {
     res.status(500).json({ error: error.message });
