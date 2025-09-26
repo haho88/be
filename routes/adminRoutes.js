@@ -1045,31 +1045,10 @@ router.delete("/ppdb/info/:id", async (req, res) => {
 
 
 // ==================== PPDB FORMULIR ====================
-// ➡️ Create (daftar PPDB)
-router.post("/formulir", upload.single("ijazah"), async (req, res) => {
-  try {
-    const { nama, nisn, alamat, asalSekolah, noHp } = req.body;
-
-    const newFormulir = new FormulirPPDB({
-      nama,
-      nisn,
-      alamat,
-      asalSekolah,
-      noHp,
-      ijazah: req.file ? req.file.filename : null, // simpan nama file
-    });
-
-    await newFormulir.save();
-    res.status(201).json({ message: "Pendaftaran berhasil", data: newFormulir });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // ➡️ Read (lihat semua pendaftar)
 router.get("/formulir", async (req, res) => {
   try {
-    const data = await FormulirPPDB.find().sort({ createdAt: -1 }); // urut terbaru dulu
+    const data = await FormulirPPDB.find().sort({ createdAt: -1 });
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1087,7 +1066,7 @@ router.get("/formulir/:id", async (req, res) => {
   }
 });
 
-// ➡️ Delete (hapus pendaftar)
+// ➡️ Delete (hapus pendaftar + hapus file Cloudinary)
 router.delete("/formulir/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -1095,9 +1074,8 @@ router.delete("/formulir/:id", async (req, res) => {
 
     if (!form) return res.status(404).json({ error: "Data tidak ditemukan" });
 
-    if (form.ijazah) {
-      const filePath = path.join("uploads", form.ijazah);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    if (form.ijazahPublicId) {
+      await cloudinary.uploader.destroy(form.ijazahPublicId);
     }
 
     res.json({ message: "Data berhasil dihapus" });
